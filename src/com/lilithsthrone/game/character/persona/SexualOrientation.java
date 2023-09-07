@@ -13,7 +13,7 @@ public enum SexualOrientation {
 
 	AMBIPHILIC("ambiphilic", true, true, PresetColour.ANDROGYNOUS, SexualOrientationPreference.THREE_AVERAGE),
 
-	GYNEPHILIC("gynephilic", true, false, PresetColour.FEMININE, SexualOrientationPreference.THREE_AVERAGE);
+	GYNEPHILIC("gynephilic", true, true, PresetColour.FEMININE, SexualOrientationPreference.THREE_AVERAGE);
 
 	private String name;
 	private Colour colour;
