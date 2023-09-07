@@ -36,7 +36,7 @@ public enum PenisLength {
 	SIX_GIGANTIC("gigantic", 50, 60, PresetColour.GENERIC_SIZE_SEVEN),
 
 	/**And this is for "extreme proportion" content. (24-40 inches)*/
-	SEVEN_STALLION("stallion-sized", 60, 100, PresetColour.GENERIC_SIZE_EIGHT);
+	SEVEN_STALLION("stallion-sized", 60, 300, PresetColour.GENERIC_SIZE_EIGHT);
 
 	private int minimumValue, maximumValue;
 	private String descriptor;
