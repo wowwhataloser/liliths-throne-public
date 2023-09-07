@@ -18,12 +18,12 @@ import com.lilithsthrone.utils.colours.PresetColour;
 public enum Gender {
 	
 	// Masculine:
-	M_P_V_B_HERMAPHRODITE(GenderNames.Y_PENIS_Y_VAGINA_Y_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
-	M_P_V_HERMAPHRODITE(GenderNames.Y_PENIS_Y_VAGINA_N_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
-	M_P_B_BUSTYBOY(GenderNames.Y_PENIS_N_VAGINA_Y_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
+	M_P_V_B_HERMAPHRODITE(GenderNames.Y_PENIS_Y_VAGINA_Y_BREASTS, PronounType.MASCULINE, PresetColour.FEMININE, ContentPreferenceValue.ZERO_NONE),
+	M_P_V_HERMAPHRODITE(GenderNames.Y_PENIS_Y_VAGINA_N_BREASTS, PronounType.MASCULINE, PresetColour.FEMININE, ContentPreferenceValue.ZERO_NONE),
+	M_P_B_BUSTYBOY(GenderNames.Y_PENIS_N_VAGINA_Y_BREASTS, PronounType.MASCULINE, PresetColour.FEMININE, ContentPreferenceValue.ZERO_NONE),
 	M_P_MALE(GenderNames.Y_PENIS_N_VAGINA_N_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.THREE_AVERAGE),
 	M_V_B_BUTCH(GenderNames.N_PENIS_Y_VAGINA_Y_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
-	M_V_CUNTBOY(GenderNames.N_PENIS_Y_VAGINA_N_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
+	M_V_CUNTBOY(GenderNames.N_PENIS_Y_VAGINA_N_BREASTS, PronounType.MASCULINE, PresetColour.FEMININE, ContentPreferenceValue.ZERO_NONE),
 	M_B_MANNEQUIN(GenderNames.N_PENIS_N_VAGINA_Y_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
 	M_MANNEQUIN(GenderNames.N_PENIS_N_VAGINA_N_BREASTS, PronounType.MASCULINE, PresetColour.MASCULINE, ContentPreferenceValue.ZERO_NONE),
 	
