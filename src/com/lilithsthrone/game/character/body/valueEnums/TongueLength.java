@@ -17,7 +17,7 @@ public enum TongueLength {
 
 	THREE_EXTREMELY_LONG("extremely long", 20, 30),
 
-	FOUR_ABSURDLY_LONG("absurdly long", 30, 60);
+	FOUR_ABSURDLY_LONG("absurdly long", 30, 280);
 
 	private int minimumValue, maximumValue;
 	private String descriptor;
