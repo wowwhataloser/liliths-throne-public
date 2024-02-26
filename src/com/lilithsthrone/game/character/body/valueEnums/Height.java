@@ -43,8 +43,8 @@ public enum Height {
 	/**7'6" to 9'"*/
 	SIX_GIANT("gigantic", 228, 274, PresetColour.GENERIC_SIZE_SEVEN),
 
-	/**9' to 12'*/
-	SEVEN_COLOSSAL("colossal", 274, 366, PresetColour.GENERIC_SIZE_EIGHT);
+	/**9' to 100'*/
+	SEVEN_COLOSSAL("colossal", 274, 3048, PresetColour.GENERIC_SIZE_EIGHT);
 	
 	private int minimumValue;
 	private int maximumValue;
