@@ -34,7 +34,7 @@ public enum CumProduction {
 	SIX_EXTREME("extreme", "an extreme amount of", 100, 1000, 0, Wetness.SIX_SOPPING_WET, PresetColour.GENERIC_SIZE_SEVEN, 4),
 	
 	/** This and SIX_EXTREME are a bit ridiculous, and should only be used as part of "extreme proportion" content. */
-	SEVEN_MONSTROUS("monstrous", "a monstrous amount of", 1000, 10000000000000, 0, Wetness.SEVEN_DROOLING, PresetColour.GENERIC_SIZE_EIGHT, 8);
+	SEVEN_MONSTROUS("monstrous", "a monstrous amount of", 1000, 1000000, 0, Wetness.SEVEN_DROOLING, PresetColour.GENERIC_SIZE_EIGHT, 8);
 
 	private String name;
 	private String descriptor;
