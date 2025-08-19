@@ -46,7 +46,7 @@ import com.lilithsthrone.utils.colours.PresetColour;
  * Call initialiseCombat() before using.
  *
  * @since 0.1.0
- * @version 0.4.2.1
+ * @version 0.4.9
  * @author Innoxia, Irbynx
  */
 public class Combat {
@@ -62,6 +62,7 @@ public class Combat {
 	private List<GameCharacter> activeCombatants; // A list of combatants who are still active in the fight. This is updated at the very end of each combat turn, and removes characters which have been defeated during the last turn.
 	
 	private float escapeChance = 0;
+	private boolean submitBlocked = false;
 	private Map<GameCharacter, Float> totalDamageTaken;
 	private int turn = 0;
 	private boolean attemptedEscape = false;
@@ -107,6 +108,7 @@ public class Combat {
 				enemyLeader,
 				enemies,
 				openingDescriptions,
+				false,
 				false);
 	}
 	/**
@@ -122,7 +124,8 @@ public class Combat {
 			NPC enemyLeader,
 			List<NPC> enemies,
 			Map<GameCharacter, String> openingDescriptions,
-			boolean escapeBlocked) {
+			boolean escapeBlocked,
+			boolean submitBlocked) {
 		
 		// These should be set manually after initialising combat
 		playerPostVictoryDialogue = null;
@@ -218,6 +221,8 @@ public class Combat {
 				}
 			}
 		}
+		
+		this.submitBlocked = submitBlocked;
 		
 		String startingEffect = "";
 		
@@ -515,7 +520,7 @@ public class Combat {
 				}
 			}
 			
-			int money = Main.game.getPlayer().getMoney();
+			long money = Main.game.getPlayer().getMoney();
 			int moneyLoss = (-enemyLeader.getLootMoney()/2)*enemies.size();
 			if(moneyLoss!=0 && enemyLeader.isLootingPlayerAfterCombat()) {
 				Main.game.getPlayer().incrementMoney(moneyLoss);
@@ -970,11 +975,15 @@ public class Combat {
 								:index-7;
 					
 					if(index==9) {
-						return new Response("Submit",
-								(getEnemies(Main.game.getPlayer()).size()==1
-									?"Surrender this fight to your opponent, allowing them to do whatever they want to you."
-									:"Surrender this fight to your enemies, allowing them to do whatever they want to you."),
-								SUBMIT);
+						if(Main.combat.isSubmitBlocked()) {
+							return new Response("Submit", "You cannot submit in this combat scene!", null);
+						} else {
+							return new Response("Submit",
+									(getEnemies(Main.game.getPlayer()).size()==1
+										?"Surrender this fight to your opponent, allowing them to do whatever they want to you."
+										:"Surrender this fight to your enemies, allowing them to do whatever they want to you."),
+									SUBMIT);
+						}
 						
 					} else if(index==10) {
 						if (escapeChance == 0) {
@@ -1984,67 +1993,71 @@ public class Combat {
 	}
 	
 	public void addAlly(NPC ally) {
-		allies.add(ally);
-		allCombatants.add(ally);
-		ally.resetMoveCooldowns();
-		
-		predictionContent.put(ally, new ArrayList<>());
-		itemsToBeUsed.put(ally, new ArrayList<>());
-		manaBurnStack.put(ally, new Stack<>());
-		statusEffectsToApply.put(ally, new HashMap<>());
-		combatContent.put(ally, new ArrayList<>());
-		activeCombatants.add(ally);
-		
-		resetWeaponsThrownDuringTurn(ally);
-		resetWeaponsThrownDuringCombat(ally);
-		resetThrownWeaponsDepleted(ally);
-		
-		if(Main.game.isInCombat()) {
-			List<GameCharacter> npcAllies = getAllies(ally);
-			List<GameCharacter> npcEnemies = getEnemies(ally);
+		if(!allies.contains(ally)) {
+			allies.add(ally);
+			allCombatants.add(ally);
+			ally.resetMoveCooldowns();
 			
-			applyNewTurnShielding(ally);
-			ally.setRemainingAP(ally.getMaxAP(), npcEnemies, npcAllies);
+			predictionContent.put(ally, new ArrayList<>());
+			itemsToBeUsed.put(ally, new ArrayList<>());
+			manaBurnStack.put(ally, new Stack<>());
+			statusEffectsToApply.put(ally, new HashMap<>());
+			combatContent.put(ally, new ArrayList<>());
+			activeCombatants.add(ally);
 			
-			npcAllies.removeIf((c)->isCombatantDefeated(c));
-			npcEnemies.removeIf((c)->isCombatantDefeated(c));
+			resetWeaponsThrownDuringTurn(ally);
+			resetWeaponsThrownDuringCombat(ally);
+			resetThrownWeaponsDepleted(ally);
 			
-			// Figures out new moves for NPCs:
-			ally.selectMoves(npcEnemies, npcAllies);
-			predictionContent.put(ally, ally.getMovesPredictionString(npcEnemies, npcAllies));
+			if(Main.game.isInCombat()) {
+				List<GameCharacter> npcAllies = getAllies(ally);
+				List<GameCharacter> npcEnemies = getEnemies(ally);
+				
+				applyNewTurnShielding(ally);
+				ally.setRemainingAP(ally.getMaxAP(), npcEnemies, npcAllies);
+				
+				npcAllies.removeIf((c)->isCombatantDefeated(c));
+				npcEnemies.removeIf((c)->isCombatantDefeated(c));
+				
+				// Figures out new moves for NPCs:
+				ally.selectMoves(npcEnemies, npcAllies);
+				predictionContent.put(ally, ally.getMovesPredictionString(npcEnemies, npcAllies));
+			}
 		}
 	}
 	
 	public void addEnemy(NPC enemy) {
-		enemies.add(enemy);
-		allCombatants.add(enemy);
-		enemy.resetMoveCooldowns();
-		enemy.setFoughtPlayerCount(enemy.getFoughtPlayerCount()+1);
-		
-		predictionContent.put(enemy, new ArrayList<>());
-		itemsToBeUsed.put(enemy, new ArrayList<>());
-		manaBurnStack.put(enemy, new Stack<>());
-		statusEffectsToApply.put(enemy, new HashMap<>());
-		combatContent.put(enemy, new ArrayList<>());
-		activeCombatants.add(enemy);
-
-		resetWeaponsThrownDuringTurn(enemy);
-		resetWeaponsThrownDuringCombat(enemy);
-		resetThrownWeaponsDepleted(enemy);
-		
-		if(Main.game.isInCombat()) {
-			List<GameCharacter> npcAllies = getAllies(enemy);
-			List<GameCharacter> npcEnemies = getEnemies(enemy);
+		if(!enemies.contains(enemy)) {
+			enemies.add(enemy);
+			allCombatants.add(enemy);
+			enemy.resetMoveCooldowns();
+			enemy.setFoughtPlayerCount(enemy.getFoughtPlayerCount()+1);
 			
-			applyNewTurnShielding(enemy);
-			enemy.setRemainingAP(enemy.getMaxAP(), npcEnemies, npcAllies);
+			predictionContent.put(enemy, new ArrayList<>());
+			itemsToBeUsed.put(enemy, new ArrayList<>());
+			manaBurnStack.put(enemy, new Stack<>());
+			statusEffectsToApply.put(enemy, new HashMap<>());
+			combatContent.put(enemy, new ArrayList<>());
+			activeCombatants.add(enemy);
+	
+			resetWeaponsThrownDuringTurn(enemy);
+			resetWeaponsThrownDuringCombat(enemy);
+			resetThrownWeaponsDepleted(enemy);
 			
-			npcAllies.removeIf((c)->isCombatantDefeated(c));
-			npcEnemies.removeIf((c)->isCombatantDefeated(c));
-			
-			// Figures out new moves for NPCs:
-			enemy.selectMoves(npcEnemies, npcAllies);
-			predictionContent.put(enemy, enemy.getMovesPredictionString(npcEnemies, npcAllies));
+			if(Main.game.isInCombat()) {
+				List<GameCharacter> npcAllies = getAllies(enemy);
+				List<GameCharacter> npcEnemies = getEnemies(enemy);
+				
+				applyNewTurnShielding(enemy);
+				enemy.setRemainingAP(enemy.getMaxAP(), npcEnemies, npcAllies);
+				
+				npcAllies.removeIf((c)->isCombatantDefeated(c));
+				npcEnemies.removeIf((c)->isCombatantDefeated(c));
+				
+				// Figures out new moves for NPCs:
+				enemy.selectMoves(npcEnemies, npcAllies);
+				predictionContent.put(enemy, enemy.getMovesPredictionString(npcEnemies, npcAllies));
+			}
 		}
 	}
 	
@@ -2188,5 +2201,9 @@ public class Combat {
 
 	public void setPlayerPostDefeatDialogue(DialogueNode playerPostDefeatDialogue) {
 		this.playerPostDefeatDialogue = playerPostDefeatDialogue;
+	}
+
+	public boolean isSubmitBlocked() {
+		return submitBlocked;
 	}
 }

@@ -1,5 +1,6 @@
 package com.lilithsthrone.game.dialogue.utils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.lilithsthrone.game.Game;
 import com.lilithsthrone.game.PropertyValue;
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.attributes.AbstractAttribute;
@@ -78,6 +80,8 @@ import com.lilithsthrone.utils.Util;
 import com.lilithsthrone.utils.Util.Value;
 import com.lilithsthrone.utils.colours.Colour;
 import com.lilithsthrone.utils.colours.PresetColour;
+import com.lilithsthrone.utils.time.DateAndTime;
+import com.lilithsthrone.utils.time.SolarElevationAngle;
 import com.lilithsthrone.world.AbstractWorldType;
 import com.lilithsthrone.world.WorldRegion;
 import com.lilithsthrone.world.WorldType;
@@ -2961,6 +2965,8 @@ public class PhoneDialogue {
 		return Math.min(size, Main.getProperties().getItemsDiscoveredCount())+"/"+size;
 	}
 	
+	private static int encyclopediaItemIndex = 0;
+	
 	public static final DialogueNode ENCYCLOPEDIA = new DialogueNode("Encyclopedia", "", true) {
 		@Override
 		public String getContent() {
@@ -3030,6 +3036,7 @@ public class PhoneDialogue {
 						"Have a look at all the different items that you've encountered in your travels.", ITEM_CATALOGUE){
 					@Override
 					public void effects() {
+						encyclopediaItemIndex = 0;
 						Main.getProperties().setValue(PropertyValue.newItemDiscovered, false);
 					}
 				};
@@ -3078,6 +3085,20 @@ public class PhoneDialogue {
 	
 	private static Map<String, List<InventorySlot>> clothingSlotCategories;
 	private static String clothingSlotKey;
+	
+	/**
+	 * @return A list of all clothing which is available to the player in a normal game. i.e. A list of all clothing excluding silly mode or cheat items.
+	 */
+	public static List<AbstractClothingType> getClothingDiscoveredList() {
+		return clothingDiscoveredList;
+	}
+
+	/**
+	 * @return A list of all weapons which are available to the player in a normal game. i.e. A list of all weapons excluding silly mode or cheat items.
+	 */
+	public static List<AbstractWeaponType> getWeaponsDiscoveredList() {
+		return weaponsDiscoveredList;
+	}
 	
 	static {
 		itemsDiscoveredList.addAll(ItemType.getAllItems());
@@ -3183,9 +3204,10 @@ public class PhoneDialogue {
 								+ "</div>";
 				sbDamageTypes.setLength(0);
 				if(discovered) {
+					float width = weaponType.getAvailableDamageTypes().size()>4?(72/weaponType.getAvailableDamageTypes().size()):18;
 					for(DamageType dt : weaponType.getAvailableDamageTypes()) {
 						sbDamageTypes.append("<div class='square-button' "+(discovered?"id='"+(weaponType.getId()+"_"+dt.toString())+"'":"")
-												+ " style='cursor:default; width:18%; margin:1%; padding:0; background-color:"+dt.getMultiplierAttribute().getColour().toWebHexString()+";'>"
+												+ " style='cursor:default; width:"+width+"%; margin:1%; padding:0; background-color:"+dt.getMultiplierAttribute().getColour().toWebHexString()+";'>"
 											+ "</div>");
 					}
 				}
@@ -3266,13 +3288,13 @@ public class PhoneDialogue {
 					continue;
 				}
 				boolean discovered = Main.getProperties().isClothingDiscovered(clothingType);
-				String entry = "<div class='inventory-item-slot unequipped' style='background-color:"+clothingType.getRarity().getBackgroundColour().toWebHexString()+"; width:8%;'>"
-									+ "<div class='inventory-icon-content'>"+(discovered?clothingType.getSVGImageRandomColour(true, false, false):"")+"</div>"
-									+ "<div class='overlay"+(discovered?"' id='"+clothingType.getId()+"'":" disabled-dark'")+" style='cursor:default;'></div>"
-								+ "</div>";
 				
 				for(InventorySlot slot : clothingType.getEquipSlots()) {
 					if(slots.contains(slot)) {
+						String entry = "<div class='inventory-item-slot unequipped' style='background-color:"+clothingType.getRarity().getBackgroundColour().toWebHexString()+"; width:8%;'>"
+								+ "<div class='inventory-icon-content'>"+(discovered?clothingType.getSVGImageRandomColour(slot, true, false, false):"")+"</div>"
+								+ "<div class='overlay"+(discovered?"' id='"+clothingType.getId()+"_"+slot.toString()+"'":" disabled-dark'")+" style='cursor:default;'></div>"
+							+ "</div>";
 						sbMap.get(slot).append(entry);
 						discoveredMap.put(slot, new Value<>(discoveredMap.get(slot).getKey()+(discovered?1:0), discoveredMap.get(slot).getValue()+1));
 					}
@@ -3382,45 +3404,91 @@ public class PhoneDialogue {
 				}
 			}
 			
-			sb.append("<div class='container-full-width'>");
-				sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
-					sb.append("[style.boldBlueLight(Items ("+itemKnownCount+"/"+itemCount+"))]");
-				sb.append("</p>");
-				sb.append(sbItems.toString());
-			sb.append("</div>");
+			if(encyclopediaItemIndex==0) {
+				sb.append("<div class='container-full-width'>");
+					sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
+						sb.append("[style.boldBlueLight(Items ("+itemKnownCount+"/"+itemCount+"))]");
+					sb.append("</p>");
+					sb.append(sbItems.toString());
+				sb.append("</div>");
+			}
 
-			sb.append("<div class='container-full-width'>");
-				sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
-					sb.append("[style.boldOrange(Books ("+bookKnownCount+"/"+bookCount+"))]");
-				sb.append("</p>");
-				sb.append(sbBooks.toString());
-			sb.append("</div>");
+			if(encyclopediaItemIndex==1) {
+				sb.append("<div class='container-full-width'>");
+					sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
+						sb.append("[style.boldOrange(Books ("+bookKnownCount+"/"+bookCount+"))]");
+					sb.append("</p>");
+					sb.append(sbBooks.toString());
+				sb.append("</div>");
+				
+				sb.append("<div class='container-full-width'>");
+					sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
+						sb.append("[style.boldArcane(Essences ("+essenceKnownCount+"/"+essenceCount+"))]");
+					sb.append("</p>");
+					sb.append(sbEssences.toString());
+				sb.append("</div>");
+			}
 
-			sb.append("<div class='container-full-width'>");
-				sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
-					sb.append("[style.boldArcane(Essences ("+essenceKnownCount+"/"+essenceCount+"))]");
-				sb.append("</p>");
-				sb.append(sbEssences.toString());
-			sb.append("</div>");
-
-			sb.append("<div class='container-full-width'>");
-				sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
-					sb.append("[style.boldSpells(Spells ("+spellKnownCount+"/"+spellCount+"))]");
-				sb.append("</p>");
-				sb.append(sbSpells.toString());
-			sb.append("</div>");
+			if(encyclopediaItemIndex==2) {
+				sb.append("<div class='container-full-width'>");
+					sb.append("<p style='width:100%; text-align:center; padding:0 margin:0;'>");
+						sb.append("[style.boldSpells(Spells ("+spellKnownCount+"/"+spellCount+"))]");
+					sb.append("</p>");
+					sb.append(sbSpells.toString());
+				sb.append("</div>");
+			}
 			
 			return sb.toString();
 		}
 
 		@Override
 		public Response getResponse(int responseTab, int index) {
-			if (index == 0) {
+			if(index==1) {
+				return new Response("Items",
+						encyclopediaItemIndex==0
+							?"You're already viewing all of the items that you've discovered..."
+							:"View all of the items that you've discovered.",
+						encyclopediaItemIndex==0
+							?null
+							:ITEM_CATALOGUE){
+					@Override
+					public void effects() {
+						encyclopediaItemIndex = 0;
+					}
+				};
+				
+			} else if(index==2) {
+				return new Response("Books & essences",
+						encyclopediaItemIndex==1
+							?"You're already viewing all of the racial books and essences that you've discovered..."
+							:"View all of the racial books and essences that you've discovered.",
+						encyclopediaItemIndex==1
+							?null
+							:ITEM_CATALOGUE){
+					@Override
+					public void effects() {
+						encyclopediaItemIndex = 1;
+					}
+				};
+				
+			} else if(index==3) {
+				return new Response("Spell books",
+						encyclopediaItemIndex==2
+							?"You're already viewing all of the spell books that you've discovered..."
+							:"View all of the spell books that you've discovered.",
+						encyclopediaItemIndex==2
+							?null
+							:ITEM_CATALOGUE){
+					@Override
+					public void effects() {
+						encyclopediaItemIndex = 2;
+					}
+				};
+				
+			} else if (index == 0) {
 				return new Response("Back", "Return to the encyclopedia.", ENCYCLOPEDIA);
-			
-			} else {
-				return null;
 			}
+			return null;
 		}
 
 		@Override
@@ -3464,22 +3532,79 @@ public class PhoneDialogue {
 		public String getContent() {
 			UtilText.nodeContentSB.setLength(0);
 			
+			// Race (X/Y), book icon if advanced knowledge found
+			
 			UtilText.nodeContentSB.append(
 					"<p style='text-align:center;'>"
-						+ "You have encountered the following races in your travels:<br/>"
-						+ "(Discovered races are [style.boldGood(highlighted)], while undiscovered races are [style.colourDisabled(greyed out)].)"
+						+ "You have encountered the following races in your travels:"
+						+ "<br/>"
+						+ "The number of discovered subspecies for each race are shown in brackets."
+						+ "<br/>"
+						+ "If you have unlocked advanced knowledge of the race, its icon will be shown."
+//						+ "Discovered races are [style.boldGood(highlighted)], while undiscovered races are [style.colourDisabled(greyed out)]."
 					+ "</p>");
 			List<AbstractRace> sortedRaces = new ArrayList<>();
 			sortedRaces.addAll(Race.getAllRaces());
 			sortedRaces.remove(Race.NONE);
 			sortedRaces.sort((r1, r2) -> r1.getName(false).compareTo(r2.getName(false)));
+			int unknownRaces=0;
 			for(AbstractRace race : sortedRaces) {
-				UtilText.nodeContentSB.append("<div style='box-sizing: border-box; text-align:center; width:50%; padding:8px; margin:0; float:left;'>");
-				if(racesDiscovered.contains(race)) {
-					UtilText.nodeContentSB.append("<b style='color:"+race.getColour().toWebHexString()+";'>" + Util.capitaliseSentence(race.getName(false)) + "</b>");
-				} else {
-					UtilText.nodeContentSB.append("[style.colourDisabled(" + Util.capitaliseSentence(race.getName(false)) + ")]");
+				int discoveredSubspecies = 0;
+				int totalSubspecies = 0;
+				boolean fullKnowledge = true;
+				for(AbstractSubspecies subspecies : Subspecies.getSubspeciesOfRace(race)) {
+					if(subspeciesDiscovered.contains(subspecies)) {
+						discoveredSubspecies++;
+					}
+					if(!Main.getProperties().isAdvancedRaceKnowledgeDiscovered(subspecies)) {
+						fullKnowledge = false;
+					}
+					totalSubspecies++;
 				}
+				if(discoveredSubspecies==0) {
+					unknownRaces++;
+					continue;
+				}
+				String icon = 
+						"<div class='inventory-item-slot' style='width:10%; margin:0; "+(!fullKnowledge?"opacity:0.25;":"")+" pointer-events:none;'>"
+							+(fullKnowledge
+								?AbstractSubspecies.getMainSubspeciesOfRace(race).getSVGString(null)
+								:"")//"<div style='width:100%;height:100%;position:absolute;left:0;bottom:0;'>"+SVGImages.SVG_IMAGE_PROVIDER.getRaceUnknown()+"</div>")
+						+"</div>";
+				
+				String discoveredInfo =
+						"<div style='float:left; width:20%; margin:0; text-align:right;'>"
+							+(discoveredSubspecies==0
+								?"[style.colourDisabled((?/?))]"
+								:(discoveredSubspecies==totalSubspecies
+									?"[style.colourGood("
+									:"")
+										+"("+discoveredSubspecies+"/"+totalSubspecies+")"
+								+ (discoveredSubspecies==totalSubspecies?")]":""))
+						+ "</div>";
+				//position:relative; width:"+(Util.random.nextInt(23)+10)+"%; padding:2px; margin:0.5%; float:left;filter:blur(1px) grayscale(0.8); font-size:12px; transform: rotate("+(-20+Util.random.nextInt(41))+"deg);'>
+				UtilText.nodeContentSB.append("<div class='container-full-width' style='position:relative; width:32%; padding:2px; margin:0.5%; float:left;'>");
+					UtilText.nodeContentSB.append("<div class='overlay' id='ENCYCLOPEDIA_RACE_"+Race.getIdFromRace(race)+"'></div>");
+					UtilText.nodeContentSB.append(icon);
+					UtilText.nodeContentSB.append("<div style='float:left; text-align:center; width:70%; margin:0;'>");
+							if(discoveredSubspecies==0) {
+								UtilText.nodeContentSB.append("[style.colourDisabled(???)]");
+							} else if(racesDiscovered.contains(race)) {
+								UtilText.nodeContentSB.append("<span style='color:"+race.getColour().toWebHexString()+";'>" + Util.capitaliseSentence(race.getName(false)) + "</span>");
+							} else {
+								UtilText.nodeContentSB.append("[style.colourDisabled(" + Util.capitaliseSentence(race.getName(false))+")]");
+							}
+						UtilText.nodeContentSB.append("</div>");
+					UtilText.nodeContentSB.append(discoveredInfo);
+				UtilText.nodeContentSB.append("</div>");
+			}
+			for(int i=0; i<unknownRaces;i++) {
+				UtilText.nodeContentSB.append("<div class='container-full-width' style='position:relative; width:32%; padding:2px; margin:0.5%; float:left;'>");
+					UtilText.nodeContentSB.append("<div class='inventory-item-slot' style='width:10%; margin:0; opacity:0.2;'></div>");
+					UtilText.nodeContentSB.append("<div style='float:left; text-align:center; width:70%; margin:0;'>");
+								UtilText.nodeContentSB.append("[style.colourDisabled(???)]");
+						UtilText.nodeContentSB.append("</div>");
+					UtilText.nodeContentSB.append("<div style='float:left; width:20%; margin:0; text-align:right;'>[style.colourDisabled((?/?))]</div>");
 				UtilText.nodeContentSB.append("</div>");
 			}
 			
@@ -3497,17 +3622,7 @@ public class PhoneDialogue {
 						SUBSPECIES){
 					@Override
 					public void effects() {
-						raceSelected = racesDiscovered.get(index - 1);
-						subspeciesSelected = AbstractSubspecies.getMainSubspeciesOfRace(raceSelected);
-						if(!subspeciesDiscovered.contains(subspeciesSelected)) {
-							for(AbstractSubspecies sub : subspeciesDiscovered) {
-								if(sub.getRace()==raceSelected) {
-									subspeciesSelected = sub;
-									break;
-								}
-							}
-						}
-						bodyForSubspeciesSelected = Main.game.getCharacterUtils().generateBody(null, Gender.M_P_MALE, subspeciesSelected, RaceStage.GREATER);
+						applyRaceSelection(racesDiscovered.get(index - 1));
 					}
 				};
 			
@@ -3521,6 +3636,20 @@ public class PhoneDialogue {
 			return DialogueNodeType.PHONE;
 		}
 	};
+	
+	public static void applyRaceSelection(AbstractRace race) {
+		raceSelected = race;
+		subspeciesSelected = AbstractSubspecies.getMainSubspeciesOfRace(raceSelected);
+		if(!subspeciesDiscovered.contains(subspeciesSelected)) {
+			for(AbstractSubspecies sub : subspeciesDiscovered) {
+				if(sub.getRace()==raceSelected) {
+					subspeciesSelected = sub;
+					break;
+				}
+			}
+		}
+		bodyForSubspeciesSelected = Main.game.getCharacterUtils().generateBody(null, Gender.M_P_MALE, subspeciesSelected, RaceStage.GREATER);
+	}
 	
 	private static List<String> getSubspeciesModifiersAsStringList(AbstractSubspecies subspecies) {
 		LinkedHashMap<AbstractAttribute, Float> attMods;
@@ -3731,11 +3860,13 @@ public class PhoneDialogue {
 					+ "</details>");
 			
 			UtilText.nodeContentSB.append(PerkManager.MANAGER.getPerkTreeDisplay(Main.game.getPlayer(), true));
+			UtilText.nodeContentSB.append("</div>");
 			
-			UtilText.nodeContentSB.append("</div>"
-					+ "<div class='container-full-width' style='padding:8px; text-align:center;'>"
-						+ "[style.italicsBad(Please note that this perk tree is a work-in-progress. This is not the final version, and is just a proof of concept!)]"
-					+ "</div>");
+			if(!Main.game.getPlayer().isDoll()) {
+				UtilText.nodeContentSB.append("<div class='container-full-width' style='padding:8px; text-align:center;'>"
+							+ "[style.italicsBad(Please note that this perk tree is a work-in-progress. This is not the final version, and is just a proof of concept!)]"
+						+ "</div>");
+			}
 			
 			return UtilText.nodeContentSB.toString();
 		}
@@ -3748,6 +3879,9 @@ public class PhoneDialogue {
 		@Override
 		public Response getResponse(int responseTab, int index) {
 			if(index==1) {
+				if(Main.game.getPlayer().isDoll()) {
+					return new Response("Reset", "You cannot reset your perks and traits while you're a doll!", null);
+				}
 				return new Response("Reset", "Reset all perks and traits, refunding all points spent. (This is a temporary action while the perk tree is still under development.)", CHARACTER_PERK_TREE) {
 					@Override
 					public void effects() {
@@ -4172,7 +4306,35 @@ public class PhoneDialogue {
 						loiter(60*24);
 					}
 				};
+				
+			} else if(index==11) {
+				int timeUntilChange = Main.game.getMinutesUntilNextSunrise() + 5; // Add 5 minutes so that if the days are drawing in, you don't get stuck in a loop of always loitering to sunset/sunrise
+				LocalDateTime[] sunriseSunset = DateAndTime.getTimeOfSolarElevationChange(Main.game.getDateNow(), SolarElevationAngle.SUN_ALTITUDE_SUNRISE_SUNSET, Game.DOMINION_LATITUDE, Game.DOMINION_LONGITUDE);
+				return new ResponseEffectsOnly("Next sunrise",
+						"Loiter in this area for " + (timeUntilChange >= 60 ?timeUntilChange / 60 + " hours " : " ")
+							+ (timeUntilChange % 60 != 0 ? timeUntilChange % 60 + " minutes" : "")
+							+ " until five minutes past sunrise ("+Units.time(sunriseSunset[0].plusMinutes(5))+")."){
+					@Override
+					public void effects() {
+						loiter(timeUntilChange);
+					}
+				};
+				
+			} else if(index==12) {
+				int timeUntilChange = Main.game.getMinutesUntilNextSunset() + 5; // Add 5 minutes so that if the days are drawing in, you don't get stuck in a loop of always loitering to sunset/sunrise
+				LocalDateTime[] sunriseSunset = DateAndTime.getTimeOfSolarElevationChange(Main.game.getDateNow(), SolarElevationAngle.SUN_ALTITUDE_SUNRISE_SUNSET, Game.DOMINION_LATITUDE, Game.DOMINION_LONGITUDE);
+				return new ResponseEffectsOnly("Next sunset",
+						"Loiter in this area for " + (timeUntilChange >= 60 ?timeUntilChange / 60 + " hours " : " ")
+							+ (timeUntilChange % 60 != 0 ? timeUntilChange % 60 + " minutes" : "")
+							+ " until five minutes past sunrise ("+Units.time(sunriseSunset[1].plusMinutes(5))+")."){
+					@Override
+					public void effects() {
+						loiter(timeUntilChange);
+					}
+				};
+				
 			}
+			
 			return null;
 		}
 
@@ -4193,8 +4355,10 @@ public class PhoneDialogue {
 					"<i>You spend the next ").append(period).append("loitering about, doing nothing in particular...</i>").append("</p>");
 			Main.game.getPlayer().setActive(false);
 			Main.game.endTurn(60*minutes);
+			Main.game.endTurnTimeTakenAddition = Main.game.endTurnTimeTaken;
 			Main.game.getPlayer().setActive(true);
 			Main.game.setContent(new Response("", "", Main.game.getDefaultDialogue()));
+			Main.game.endTurnTimeTakenAddition = Main.game.endTurnTimeTaken;
 		}
 
 		@Override

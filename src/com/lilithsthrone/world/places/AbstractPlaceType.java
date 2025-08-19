@@ -522,6 +522,17 @@ public class AbstractPlaceType {
 		return backgroundColour;
 	}
 	
+	/**
+	 * @return The core encounter type which this place type has. <b>If you want to generate an Encounter, you should be using getEncounterType() instead.</b> 
+	 */
+	public AbstractEncounter getCoreEncounterType() {
+		return encounterType;
+	}
+	
+	/**
+	 * @return A randomly-selected encounter from all possible encounters which can be triggered in this area.
+	 * <br/>If you want this place type's core encounter, use getCoreEncounterType().
+	 */
 	public AbstractEncounter getEncounterType() {
 		Map<AbstractEncounter, Float> possibleEncountersMap = new HashMap<>();
 		
@@ -646,11 +657,15 @@ public class AbstractPlaceType {
 		}
 		return darkness;
 	}
-	
+
 	public static String getSVGOverride(String pathName, Colour colour) {
-		if(!SVGOverrides.keySet().contains(pathName+colour.getId())) {
+		return getSVGOverride(pathName, colour, colour, colour);
+	}
+	
+	public static String getSVGOverride(String pathName, Colour colourPrimary, Colour colourSecondary, Colour colourTertiary) {
+		if(!SVGOverrides.keySet().contains(pathName+colourPrimary.getId())) {
 			try {
-				InputStream is = colour.getClass().getResourceAsStream("/com/lilithsthrone/res/map/" + pathName + ".svg");
+				InputStream is = colourPrimary.getClass().getResourceAsStream("/com/lilithsthrone/res/map/" + pathName + ".svg");
 				if(is==null) {
 					System.err.println("Error! PlaceType icon file does not exist (Trying to read from '"+pathName+"')! (Code 2)");
 				}
@@ -658,13 +673,13 @@ public class AbstractPlaceType {
 				
 
 				try {
-					s = SvgUtil.colourReplacement("placeColour"+colourReplacementId, colour, s);
+					s = SvgUtil.colourReplacement("placeColour"+colourReplacementId, colourPrimary, colourSecondary, colourTertiary, s);
 					colourReplacementId++;
 				} catch(Exception ex) {
 					System.err.println(pathName+" error!");
 				}
 				
-				SVGOverrides.put(pathName+colour.getId(), s);
+				SVGOverrides.put(pathName+colourPrimary.getId(), s);
 	
 				is.close();
 	
@@ -675,7 +690,7 @@ public class AbstractPlaceType {
 			}
 		}
 		
-		return SVGOverrides.get(pathName+colour.getId());
+		return SVGOverrides.get(pathName+colourPrimary.getId());
 	}
 	
 	public String getSVGString(Set<AbstractPlaceUpgrade> upgrades) {

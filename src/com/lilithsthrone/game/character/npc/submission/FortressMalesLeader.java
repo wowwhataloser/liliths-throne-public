@@ -84,7 +84,7 @@ public class FortressMalesLeader extends NPC {
 				new NameTriplet("Jhortrax", "Jhortriss", "Jhortriss"), "Liannamartu",
 				"The leader of one of Submission's imp fortresses, [npc.name] and [npc.her] all-male gang of imps take great pleasure in breeding anyone foolish enough to oppose their ruler, 'The Dark Siren'...",
 				65, Month.SEPTEMBER, 19,
-				20, Gender.M_P_MALE, Subspecies.DEMON, RaceStage.GREATER, new CharacterInventory(10), WorldType.IMP_FORTRESS_MALES, PlaceType.FORTRESS_MALES_KEEP, true);
+				20, Gender.M_P_MALE, Subspecies.DEMON, RaceStage.GREATER, new CharacterInventory(false, 10), WorldType.IMP_FORTRESS_MALES, PlaceType.FORTRESS_MALES_KEEP, true);
 
 		if(!isImported || Main.isVersionOlderThan(Game.loadingVersion, "0.2.11.5")) {
 			this.setPlayerKnowsName(false);
@@ -155,7 +155,7 @@ public class FortressMalesLeader extends NPC {
 		}
 		
 		// Body:
-		this.setAgeAppearanceDifferenceToAppearAsAge(35);
+		this.setAgeAppearanceAbsolute(35);
 		this.setTailType(TailType.DEMON_COMMON);
 		this.setWingType(WingType.DEMON_COMMON);
 		this.setLegType(LegType.DEMON_COMMON);

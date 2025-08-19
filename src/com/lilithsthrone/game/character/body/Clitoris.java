@@ -17,7 +17,7 @@ import com.lilithsthrone.utils.Util;
 
 /**
  * @since 0.2.8
- * @version 0.3.5.5
+ * @version 0.4.9.7
  * @author Innoxia
  */
 public class Clitoris implements BodyPartInterface {
@@ -33,6 +33,13 @@ public class Clitoris implements BodyPartInterface {
 		clitModifiers = new HashSet<>();
 	}
 
+	public Clitoris(Clitoris clitorisToCopy) {
+		this.clitSize = clitorisToCopy.clitSize;
+		this.girth = clitorisToCopy.girth;
+		
+		this.clitModifiers = new HashSet<>(clitorisToCopy.clitModifiers);
+	}
+	
 	@Override
 	public BodyPartTypeInterface getType() {
 		return null;
@@ -104,6 +111,10 @@ public class Clitoris implements BodyPartInterface {
 			if(mod!=PenetrationModifier.OVIPOSITOR) {
 				descriptors.add(mod.getName());
 			}
+		}
+
+		if(gc.getBodyMaterial().getPartDescriptors()!=null && !gc.getBodyMaterial().getPartDescriptors().isEmpty()) {
+			descriptors.add(Util.randomItemFrom(gc.getBodyMaterial().getPartDescriptors()));
 		}
 		
 		return Util.randomItemFrom(descriptors);
@@ -200,7 +211,7 @@ public class Clitoris implements BodyPartInterface {
 			} else {
 				return UtilText.parse(owner,
 						"<p>"
-								+ "[npc.Name] lets out [npc.a_moan] as [npc.she] feels a deep throbbing sensation building up at the base of [npc.her] cock."
+								+ "[npc.Name] lets out [npc.a_moan] as [npc.she] feels a deep throbbing sensation  building up within [npc.her] [npc.pussy]"
 								+ " [npc.Her] cheeks flush red as the feeling works its way up [npc.her] clit, and with a little gasp, [npc.she] feels it [style.boldShrink(shrink)].<br/>"
 								+ "[npc.She] now has [style.boldSex([npc.a_clitSize] [npc.clit])]!"
 						+ "</p>");
@@ -301,15 +312,7 @@ public class Clitoris implements BodyPartInterface {
 		if(hasClitorisModifier(modifier)) {
 			return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
 		}
-		
-		if(!owner.hasVagina()) {
-			if(owner.isPlayer()) {
-				return "<p style='text-align:center;'>[style.colourDisabled(You don't have a clitoris, so nothing happens...)]</p>";
-			} else {
-				return UtilText.parse(owner, "<p style='text-align:center;'>[style.colourDisabled([npc.Name] doesn't have a clitoris, so nothing happens...)]</p>");
-			}
-		}
-		
+
 		clitModifiers.add(modifier);
 		
 		List<String> pmsRemoved = new ArrayList<>();
@@ -320,6 +323,20 @@ public class Clitoris implements BodyPartInterface {
 				clitModifiers.remove(pm);
 			}
 		}
+
+		if(owner==null) {
+			return "";
+		}
+		
+		if(!owner.hasVagina()) {
+			if(owner.isPlayer()) {
+				return "<p style='text-align:center;'>[style.colourDisabled(You don't have a clitoris, so nothing happens...)]</p>";
+			} else {
+				return UtilText.parse(owner, "<p style='text-align:center;'>[style.colourDisabled([npc.Name] doesn't have a clitoris, so nothing happens...)]</p>");
+			}
+		}
+		
+		
 		String removedText = "";
 		if(!pmsRemoved.isEmpty()) {
 			removedText = "<br/>[style.italicsMinorBad(Due to being mutually exclusive with the '"+modifier.getName()+"' modifier, [npc.namePos] clit is no longer "+Util.stringsToStringList(pmsRemoved, false)+".)]";
@@ -531,6 +548,10 @@ public class Clitoris implements BodyPartInterface {
 		return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
 	}
 
+	public void resetClitorisModifiers() {
+		clitModifiers = new HashSet<>();
+	}
+	
 	@Override
 	public boolean isFeral(GameCharacter owner) {
 		if(owner==null) {

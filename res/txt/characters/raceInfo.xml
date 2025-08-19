@@ -503,7 +503,7 @@
 		Of all those who dwell in the fields around Elis, few are quite so numerous as the fecund rabbit-morph. Although they're primarily found making their living in vast underground burrows in the Foloi Fields, there are also large rabbit communities in Dominion and other urban environments. Rabbit-morphs, being as fertile as their animal counterparts, often reproduce far beyond what their small communities can support and so many venture forth in search of a place to make a living, making them a common sight almost anywhere in Lilith's Realm.
 	</p>
 	<p>
-		Rabbit-morphs are digitigrade and stand slightly shorter than the average human, with male rabbit-morphs being a head taller than the females. One of the defining feature of a rabbit-morph is its long ears, which stand up straight for a standard rabbit-morph and hang limply to the sides of the head on a lop-rabbit-morph. The other defining feature of a rabbit-morph is their characteristic cotton ball tail, which is short and round and sticks out at the base of its back. 
+		Rabbit-morphs are digitigrade and stand slightly shorter than the average human, with male rabbit-morphs being a head taller than the females. One of the defining features of a rabbit-morph is its long ears, which stand up straight for a standard rabbit-morph and hang limply to the sides of the head on a lop-rabbit-morph. The other defining feature of a rabbit-morph is its characteristic cotton ball tail, which is short and round and sticks out at the base of its back. 
 	</p>
 	]]>
 	</htmlContent>
@@ -766,6 +766,31 @@
 	</p>
 	<p>
 		An elemental bound to this form is able to cast a wide range of Arcane spells, and is typically only really interested in encouraging their summoner to have sex with them.
+	</p>
+	]]>
+	</htmlContent>
+
+	<!-- DOLLS -->
+
+	<htmlContent tag="DOLL_BASIC"><![CDATA[
+	<p>
+		Although there exist dozens, if not hundreds, of different types of sex doll, the one which stands apart as being truly special is the one sold at 'Lovienne's Luxuries'. Life-like features, cast in arcane-infused silicone, give these dolls a truly exceptional appearance, but it's not just their looks which they're known for. Instead, what makes them the most sought-after toys in all the realm is the fact that they're completely autonomous. The advanced animation spell which Lovienne herself has spent decades perfecting allows these dolls to move, understand and carry out orders, and even engage in conversation.
+	</p>
+	<p>
+		As is to be expected of such exceptional creations, Lovienne's sex dolls are extremely expensive. As they're not living creatures, they don't require a slaver license to own, and so there's no shortage of customers willing to pay hundreds of thousands of flames for even the most basic model. Obediently carrying out any order, able to withstand the roughest sex, and ready to fuck at a moment's notice, they're widely considered to be well worth the price.
+	</p>
+	]]>
+	</htmlContent>
+
+	<htmlContent tag="DOLL_ADVANCED"><![CDATA[
+	<p>
+		The dark secret behind these dolls is that they were once real people. Forced to ingest a huge quantity of corrupted slime, the victim is transformed into an extremely specialised subspecies of slime. Possessing a slime's unique property of having their entire body made out of a homogeneous material, the transformed victim ends up looking like a silicone sex doll.
+	</p>
+	<p>
+		Simply transforming a person's body isn't enough to turn them into an obedient sex doll, however, and it's via the second stage of the dollification process that their mental transformation is carried out. Having been subjected to a 'total essence extraction', the victim's essences are corrupted within an arcane machine that was developed by the elder lilin Lovienne. This corrupted essence is then forcibly inserted back into the victim's arcane aura, which can only be achieved at the moment of the victim's orgasm. This forceful process irreversibly breaks the new doll's mind, turning them into a perfectly obedient sex toy.
+	</p>
+	<p>
+		Although dolls do possess a slime's ability to undergo a wide range of transformations, this process must be kick-started via use of a specialised tool; the 'D.E.C.K.'. Once plugged into a doll's body, signals from this device force the victim to self-transform in the manner requested by the D.E.C.K.'s operator.
 	</p>
 	]]>
 	</htmlContent>

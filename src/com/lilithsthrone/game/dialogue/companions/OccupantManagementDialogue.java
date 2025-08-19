@@ -27,7 +27,9 @@ import com.lilithsthrone.rendering.SVGImages;
 import com.lilithsthrone.utils.Util;
 import com.lilithsthrone.utils.colours.Colour;
 import com.lilithsthrone.utils.colours.PresetColour;
+import com.lilithsthrone.utils.comparators.SlaveFemininityComparator;
 import com.lilithsthrone.utils.comparators.SlaveNameComparator;
+import com.lilithsthrone.utils.comparators.SlaveRaceComparator;
 import com.lilithsthrone.utils.comparators.SlaveRoomComparator;
 import com.lilithsthrone.utils.comparators.SlaveValueComparator;
 import com.lilithsthrone.world.AbstractWorldType;
@@ -658,17 +660,14 @@ public class OccupantManagementDialogue {
 	public static Cell cellToInspect;
 	
 	public static final DialogueNode ROOM_UPGRADES = new DialogueNode("Room Management", ".", true) {
-
 		@Override
 		public DialogueNodeType getDialogueNodeType() {
 			return DialogueNodeType.OCCUPANT_MANAGEMENT;
 		}
-		
 		@Override
 		public String getLabel() {
 			return cellToInspect.getPlace().getName()+" Management";
 		}
-
 		@Override
 		public String getContent() {
 			UtilText.nodeContentSB.setLength(0);
@@ -723,7 +722,6 @@ public class OccupantManagementDialogue {
 			if(i==0) {
 				UtilText.nodeContentSB.append("<b style='color:"+PresetColour.TEXT_GREY.toWebHexString()+";'>Empty</b>");
 			}
-			
 			
 			UtilText.nodeContentSB.append(
 					"</div>"
@@ -1122,8 +1120,6 @@ public class OccupantManagementDialogue {
 						"</div>");
 			}
 			
-			
-			
 			// Your slaves:
 			UtilText.nodeContentSB.append("<div class='container-full-width' style='text-align:center;'>"
 					+ "<h6 style='color:"+PresetColour.GENERIC_GOOD.toWebHexString()+"; text-align:center;'>Slaves Owned</h6>");
@@ -1131,20 +1127,27 @@ public class OccupantManagementDialogue {
 			//UtilText.nodeContentSB.append("<div class='container-full-width' style='text-align:center;'>");
 			//UtilText.nodeContentSB.append(  "<h6 style='color:"+PresetColour.GENERIC_ARCANE.toWebHexString()+"'>Sorting</h6>");
 			String buttonStyle = "margin:2px; width:16%;";
-			UtilText.nodeContentSB.append(  "<div class='container-full-width inner' style='text-align:center'>");
-			UtilText.nodeContentSB.append(    "<div style='width:100%;font-weight:bold;margin-top:8px'>Sort By</div>");
-			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_BY_NONE' class='normal-button"+((sortingMethod==OccupantSortingMethod.NONE)?" selected":"")+"' style='"+buttonStyle+"'>None</div>");
-			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_BY_NAME' class='normal-button"+((sortingMethod==OccupantSortingMethod.NAME)?" selected":"")+"' style='"+buttonStyle+"'>Name</div>");
-			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_BY_ROOM' class='normal-button"+((sortingMethod==OccupantSortingMethod.ROOM)?" selected":"")+"' style='"+buttonStyle+"'>Room</div>");
-			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_BY_VALUE' class='normal-button"+((sortingMethod==OccupantSortingMethod.VALUE)?" selected":"")+"' style='"+buttonStyle+"'>Value</div>");
-//			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_BY_CUSTOM_CATEGORY' class='normal-button"+((sortingMethod==OccupantSortingMethod.CUSTOM_CATEGORY)?" selected":"")+"' style='"+buttonStyle+"'>Category</div>");
-//			UtilText.nodeContentSB.append(  "</div>");
-//			UtilText.nodeContentSB.append(  "<div class='container-full-width inner' style='text-align:center'>");
-//			UtilText.nodeContentSB.append(    "<div style='width:100%;font-weight:bold;margin-top:8px'>Order</div>");
-			UtilText.nodeContentSB.append(  "<div style='width:100%; height:0;'></div>");
-			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_ASC' class='normal-button"+((!reverseSortSlaves)?" selected":"")+"' style='"+buttonStyle+"'>Ascending</div>");
-			UtilText.nodeContentSB.append(    "<div id='SORT_SLAVES_DESC' class='normal-button"+((reverseSortSlaves)?" selected":"")+"' style='"+buttonStyle+"'>Descending</div>");
-			UtilText.nodeContentSB.append(  "</div>");
+			UtilText.nodeContentSB.append("<div class='container-full-width inner' style='text-align:center'>");
+			UtilText.nodeContentSB.append("<div style='width:100%;font-weight:bold;margin-top:8px'>Sort By</div>");
+			
+			for(OccupantSortingMethod method : OccupantSortingMethod.values()) {
+				UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_"+method.toString()+"' class='normal-button"+((sortingMethod==method)?" selected":"")+"' style='"+buttonStyle+"'>"+Util.capitaliseSentence(method.getName())+"</div>");
+			}
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_NONE' class='normal-button"+((sortingMethod==OccupantSortingMethod.NONE)?" selected":"")+"' style='"+buttonStyle+"'>None</div>");
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_NAME' class='normal-button"+((sortingMethod==OccupantSortingMethod.NAME)?" selected":"")+"' style='"+buttonStyle+"'>Name</div>");
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_FEMININITY' class='normal-button"+((sortingMethod==OccupantSortingMethod.FEMININITY)?" selected":"")+"' style='"+buttonStyle+"'>Femininity</div>");
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_RACE' class='normal-button"+((sortingMethod==OccupantSortingMethod.RACE)?" selected":"")+"' style='"+buttonStyle+"'>Race</div>");
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_ROOM' class='normal-button"+((sortingMethod==OccupantSortingMethod.ROOM)?" selected":"")+"' style='"+buttonStyle+"'>Room</div>");
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_VALUE' class='normal-button"+((sortingMethod==OccupantSortingMethod.VALUE)?" selected":"")+"' style='"+buttonStyle+"'>Value</div>");
+			
+//			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_BY_CUSTOM_CATEGORY' class='normal-button"+((sortingMethod==OccupantSortingMethod.CUSTOM_CATEGORY)?" selected":"")+"' style='"+buttonStyle+"'>Category</div>");
+//			UtilText.nodeContentSB.append("</div>");
+//			UtilText.nodeContentSB.append("<div class='container-full-width inner' style='text-align:center'>");
+//			UtilText.nodeContentSB.append("<div style='width:100%;font-weight:bold;margin-top:8px'>Order</div>");
+			UtilText.nodeContentSB.append("<div style='width:100%; height:0;'></div>");
+			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_ASC' class='normal-button"+((!reverseSortSlaves)?" selected":"")+"' style='"+buttonStyle+"'>Ascending</div>");
+			UtilText.nodeContentSB.append("<div id='SORT_SLAVES_DESC' class='normal-button"+((reverseSortSlaves)?" selected":"")+"' style='"+buttonStyle+"'>Descending</div>");
+			UtilText.nodeContentSB.append("</div>");
 			//UtilText.nodeContentSB.append("<div>");
 			
 			UtilText.nodeContentSB.append(getSlaveryHeader());
@@ -1164,7 +1167,7 @@ public class OccupantManagementDialogue {
 							return (NPC)Main.game.getNPCById(npcid);
 						} catch (Exception e) {
 							// Should never happen. Just satisfying Java's pickiness.
-							System.err.println("Main.game.getNPCById("+npcid+") returning null 2nd instance in method: SLAVE_LIST.getResponse()");
+							System.err.println("Main.game.getNPCById("+npcid+") returning null in: SLAVE_LIST.getContent()");
 							return null;
 						}
 					})
@@ -1181,7 +1184,14 @@ public class OccupantManagementDialogue {
 					case VALUE:
 						ssm = new SlaveValueComparator();
 						break;
-					default:
+					case FEMININITY:
+						ssm = new SlaveFemininityComparator();
+						break;
+					case RACE:
+						ssm = new SlaveRaceComparator();
+						break;
+					case NONE:
+						ssm = null;
 						break;
 				}
 				if(ssm != null) {
@@ -1209,8 +1219,85 @@ public class OccupantManagementDialogue {
 		}
 
 		@Override
+		public String getResponseTabTitle(int index) {
+			if(index == 0) {
+				return UtilText.parse("[style.colourCompanion(Manage)]");
+			} else if(index==1
+					&& (Main.game.getCurrentDialogueNode()==CompanionManagement.SLAVE_MANAGEMENT_JOBS
+						|| Main.game.getCurrentDialogueNode()==CompanionManagement.SLAVE_MANAGEMENT_PERMISSIONS)) {
+				return UtilText.parse("[style.colourBlueLight(Change slave)]");
+			}
+			return null;
+		}
+		
+		@Override
 		public Response getResponse(int responseTab, int index) {
-			return CompanionManagement.getManagementResponses(index);
+			if(responseTab==0) {
+				return CompanionManagement.getManagementResponses(index);
+			
+			} else { // Slave selection:
+				List<NPC> slaves = Main.game.getPlayer().getSlavesOwned().stream()
+					.filter(npcid -> Main.game.isCharacterExisting(npcid))
+					.map(npcid -> {
+						try {
+							return (NPC)Main.game.getNPCById(npcid);
+						} catch (Exception e) {
+							// Should never happen. Just satisfying Java's pickiness.
+							System.err.println("Main.game.getNPCById("+npcid+") returning null in: SLAVE_LIST.getResponse()");
+							return null;
+						}
+					})
+					.filter(npc -> npc != null)
+					.collect(Collectors.toList());
+				Comparator<NPC> ssm = null;
+				switch(sortingMethod) {
+					case NAME:
+						ssm = new SlaveNameComparator();
+						break;
+					case ROOM:
+						ssm = new SlaveRoomComparator();
+						break;
+					case VALUE:
+						ssm = new SlaveValueComparator();
+						break;
+					case FEMININITY:
+						ssm = new SlaveFemininityComparator();
+						break;
+					case RACE:
+						ssm = new SlaveRaceComparator();
+						break;
+					case NONE:
+						ssm = null;
+						break;
+				}
+				if(ssm != null) {
+					if(reverseSortSlaves) {
+						ssm = Collections.reverseOrder(ssm);
+					}
+					Collections.sort(slaves, ssm);
+				}
+				int i = 0;
+				for(NPC slave : slaves) {
+					i++;
+					if(i==index) {
+						return new Response(
+								UtilText.parse(slave, "<span style='color:"+slave.getFemininity().getColour().toWebHexString()+";'>[npc.Name]</span>"),
+								UtilText.parse(slave, "Select [npc.name], your [npc.raceFull(true)] slave."),
+								Main.game.getCurrentDialogueNode()) {
+							@Override
+							public void effects() {
+								Main.game.getDialogueFlags().setManagementCompanion(slave);
+							}
+						};
+					}
+				}
+				
+				if(index==0) {
+					return CompanionManagement.getManagementResponses(index);
+				}
+				
+				return null;
+			}
 		}
 	};
 	
@@ -1290,15 +1377,13 @@ public class OccupantManagementDialogue {
 	}
 	
 	private static String getSlaveryEntry(boolean slaveOwned, GenericPlace place, NPC slave, AffectionLevel affection, float affectionChange, ObedienceLevel obedience, float obedienceChange, boolean alternateBackground) {
-		boolean showWinged = (slave.hasWings() || slave.isArmWings()) && !slave.getFleshSubspecies().isWinged();
-		
 		miscDialogueSB.setLength(0);
 		miscDialogueSB.append(
 				"<div class='container-full-width inner' style='margin-bottom:0;"+(alternateBackground?"background:"+PresetColour.BACKGROUND_ALT.toWebHexString()+";'":"'")+"'>"
 						+ "<div style='width:20%; float:left; margin:0; padding:0;'>"
 							+ "<b style='color:"+slave.getFemininity().getColour().toWebHexString()+";'>"+slave.getName(true)+"</b><br/>"
 							+ "<span style='color:"+slave.getRace().getColour().toWebHexString()+";'>"
-								+Util.capitaliseSentence((showWinged?"winged ":"")+(slave.isFeminine()?slave.getSubspecies().getSingularFemaleName(slave.getBody()):slave.getSubspecies().getSingularMaleName(slave.getBody())))+"</span><br/>"
+								+Util.capitaliseSentence((slave.isPrependWingedToRaceName()?"winged ":"")+(slave.isFeminine()?slave.getSubspecies().getSingularFemaleName(slave.getBody()):slave.getSubspecies().getSingularMaleName(slave.getBody())))+"</span><br/>"
 							+ "<span style='color:"+slave.getFemininity().getColour().toWebHexString()+";'>"+Util.capitaliseSentence(slave.getGender().getName())+"</span>"
 						+ "</div>"
 						+ "<div style='width:20%; float:left; margin:0; padding:0;'>"
@@ -1323,8 +1408,11 @@ public class OccupantManagementDialogue {
 						+ "<div style='float:left; width:15%; margin:0; padding:0;'>"
 							+ (Main.game.getDialogueFlags().getSlaveTrader()!=null
 								?(slaveOwned
-										?UtilText.formatAsMoney((int) (slave.getValueAsSlave(true)*Main.game.getDialogueFlags().getSlaveTrader().getBuyModifier()), "b", PresetColour.GENERIC_ARCANE)
-										:UtilText.formatAsMoney((int) (slave.getValueAsSlave(true)*Main.game.getDialogueFlags().getSlaveTrader().getSellModifier(null)), "b", PresetColour.GENERIC_ARCANE))
+										?UtilText.formatAsMoney((int) (slave.getValueAsSlave(true)*Main.game.getDialogueFlags().getSlaveTrader().getBuyModifier()), "b", PresetColour.TEXT)
+										:UtilText.formatAsMoney((int) (slave.getValueAsSlave(true)*Main.game.getDialogueFlags().getSlaveTrader().getSellModifier(null)), "b",
+												(slave.getValueAsSlave(true)*Main.game.getDialogueFlags().getSlaveTrader().getSellModifier(null))>Main.game.getPlayer().getMoney()
+													?PresetColour.GENERIC_BAD
+													:PresetColour.TEXT))
 								:UtilText.formatAsMoney(slave.getValueAsSlave(true)))+"<br/>"
 							+ "<b>"+Util.capitaliseSentence(slave.getSlaveJob(Main.game.getHourOfDay()).getName(slave))+" (now)</b><br/>"
 							+ UtilText.formatAsMoney(SlaveJob.getFinalDailyIncomeAfterModifiers(slave))+"/day"
@@ -1340,12 +1428,24 @@ public class OccupantManagementDialogue {
 				miscDialogueSB.append("<div id='"+slave.getId()+"_PERMISSIONS' class='square-button big'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlavePermissions()+"</div></div>");
 				
 				miscDialogueSB.append("<div id='"+slave.getId()+"_INVENTORY' class='square-button big'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getInventoryIcon()+"</div></div>");
-					
-				miscDialogueSB.append("<div "+((place.getCapacity()<=Main.game.getCharactersTreatingCellAsHome(Main.game.getPlayerCell()).size())
-							|| !place.isSlaveCell()
-							|| (slave.getLocation().equals(Main.game.getPlayer().getLocation()) && slave.getWorldLocation().equals(Main.game.getPlayer().getWorldLocation()))
-									?" id='"+slave.getId()+"_TRANSFER_DISABLED' class='square-button big disabled'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransferDisabled()+"</div></div>"
-									:" id='"+slave.getId()+"_TRANSFER' class='square-button big'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransfer()+"</div></div>"));
+				
+				if(place.getCapacity()<=Main.game.getCharactersTreatingCellAsHome(Main.game.getPlayerCell()).size()) {
+					miscDialogueSB.append("<div id='"+slave.getId()+"_TRANSFER_DISABLED_FULL' class='square-button big disabled'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransferDisabled()+"</div></div>");
+				} else if(slave.isDoll()
+							?!place.getPlaceUpgrades().contains(PlaceUpgrade.LILAYA_DOLL_CLOSET)
+							:!place.isSlaveCell() || place.getPlaceUpgrades().contains(PlaceUpgrade.LILAYA_DOLL_CLOSET)) {
+					miscDialogueSB.append("<div id='"+slave.getId()+"_TRANSFER_DISABLED_INAPPPROPRIATE' class='square-button big disabled'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransferDisabled()+"</div></div>");
+				} else if(slave.getLocation().equals(Main.game.getPlayer().getLocation()) && slave.getWorldLocation().equals(Main.game.getPlayer().getWorldLocation())) {
+					miscDialogueSB.append("<div id='"+slave.getId()+"_TRANSFER_DISABLED_ALREADY_HERE' class='square-button big disabled'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransferDisabled()+"</div></div>");
+				} else {
+					miscDialogueSB.append("<div id='"+slave.getId()+"_TRANSFER' class='square-button big'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransfer()+"</div></div>");
+				}
+				
+//				miscDialogueSB.append("<div "+((place.getCapacity()<=Main.game.getCharactersTreatingCellAsHome(Main.game.getPlayerCell()).size())
+//							|| !place.isSlaveCell()
+//							|| (slave.getLocation().equals(Main.game.getPlayer().getLocation()) && slave.getWorldLocation().equals(Main.game.getPlayer().getWorldLocation()))
+//									?" id='"+slave.getId()+"_TRANSFER_DISABLED' class='square-button big disabled'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransferDisabled()+"</div></div>"
+//									:" id='"+slave.getId()+"_TRANSFER' class='square-button big'><div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getSlaveTransfer()+"</div></div>"));
 			}
 			
 			if(Main.game.getDialogueFlags().getSlaveTrader()==null || !slave.isAbleToBeSold()) {
@@ -1388,15 +1488,13 @@ public class OccupantManagementDialogue {
 	}
 	
 	private static String getOccupantEntry(GenericPlace place, NPC occupant, AffectionLevel affection, float affectionChange, ObedienceLevel obedience, float obedienceChange, boolean alternateBackground) {
-		boolean showWinged = (occupant.hasWings() || occupant.isArmWings()) && !occupant.getFleshSubspecies().isWinged();
-
 		miscDialogueSB.setLength(0);
 		miscDialogueSB.append(
 				"<div class='container-full-width inner' style='margin-bottom:0;"+(alternateBackground?"background:"+PresetColour.BACKGROUND_ALT.toWebHexString()+";'":"'")+"'>"
 						+ "<div style='width:20%; float:left; margin:0; padding:0;'>"
 							+ "<b style='color:"+occupant.getFemininity().getColour().toWebHexString()+";'>"+occupant.getName(true)+"</b><br/>"
 							+ "<span style='color:"+occupant.getRace().getColour().toWebHexString()+";'>"
-								+Util.capitaliseSentence((showWinged?"winged ":"")+(occupant.isFeminine()?occupant.getSubspecies().getSingularFemaleName(occupant.getBody()):occupant.getSubspecies().getSingularMaleName(occupant.getBody())))+"</span><br/>"
+								+Util.capitaliseSentence((occupant.isPrependWingedToRaceName()?"winged ":"")+(occupant.isFeminine()?occupant.getSubspecies().getSingularFemaleName(occupant.getBody()):occupant.getSubspecies().getSingularMaleName(occupant.getBody())))+"</span><br/>"
 							+ "<span style='color:"+occupant.getFemininity().getColour().toWebHexString()+";'>"+Util.capitaliseSentence(occupant.getGender().getName())+"</span>"
 						+ "</div>"
 						+ "<div style='width:20%; float:left; margin:0; padding:0;'>"
@@ -1423,8 +1521,16 @@ public class OccupantManagementDialogue {
 							+ "<span style='color:"+obedience.getColour().toWebHexString()+";'>"+Util.capitaliseSentence(obedience.getName())+"</span>"
 						+"</div>"
 						+ "<div style='float:left; width:15%; margin:0; padding:0;'>"
-							+ "<b>"+Util.capitaliseSentence(occupant.getHistory().getName(occupant))+"</b><br/>"
-							+ UtilText.formatAsMoney(occupant.hasJob()?PlaceUpgrade.LILAYA_GUEST_ROOM.getUpkeep():0)+"/day"
+							+ "<b>"
+								+(occupant.hasJob() || !occupant.hasAnySlaveJobAssigned()
+									?Util.capitaliseSentence(occupant.getHistory().getName(occupant))
+									:Util.capitaliseSentence(occupant.getSlaveJob(Main.game.getHourOfDay()).getName(occupant))+" (now)")
+							+"</b>"
+							+ "<br/>"
+							+ UtilText.formatAsMoney(occupant.hasJob()
+									?PlaceUpgrade.LILAYA_GUEST_ROOM.getUpkeep()
+									:SlaveJob.getFinalDailyIncomeAfterModifiers(occupant))
+								+"/day"
 						+"</div>"
 							
 				+ "<div style='float:left; width:15%; margin:0 auto; padding:0; display:inline-block; text-align:center;'>"

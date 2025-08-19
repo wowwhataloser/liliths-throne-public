@@ -73,7 +73,7 @@ public class Cultist extends NPC {
 				Gender.F_P_V_B_FUTANARI,
 				Subspecies.DEMON,
 				RaceStage.GREATER,
-				new CharacterInventory(10),
+				new CharacterInventory(false, 10),
 				WorldType.DOMINION,
 				PlaceType.DOMINION_BACK_ALLEYS,
 				false);
@@ -99,7 +99,7 @@ public class Cultist extends NPC {
 
 			this.setHistory(Occupation.NPC_CULTIST);
 			
-			this.setAgeAppearanceDifferenceToAppearAsAge(18+Util.random.nextInt(10));
+			this.setAgeAppearanceAbsolute(18+Util.random.nextInt(10));
 			
 			this.setVaginaVirgin(false);
 			this.setAssVirgin(false);
@@ -136,7 +136,7 @@ public class Cultist extends NPC {
 			this.setFetishDesire(Fetish.FETISH_PENIS_GIVING, FetishDesire.TWO_NEUTRAL);
 		}
 		if(Main.isVersionOlderThan(Game.loadingVersion, "0.2.11")) {
-			this.setAgeAppearanceDifferenceToAppearAsAge(18+Util.random.nextInt(10));
+			this.setAgeAppearanceAbsolute(18+Util.random.nextInt(10));
 		}
 		if(Main.isVersionOlderThan(Game.loadingVersion, "0.3.3.6")) {
 			this.setLevel(15);

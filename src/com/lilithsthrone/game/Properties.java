@@ -1,10 +1,13 @@
 package com.lilithsthrone.game;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -21,6 +24,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.lilithsthrone.controller.xmlParsing.XMLUtil;
+import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.body.valueEnums.AgeCategory;
 import com.lilithsthrone.game.character.body.valueEnums.CupSize;
 import com.lilithsthrone.game.character.fetishes.AbstractFetish;
@@ -50,12 +54,14 @@ import com.lilithsthrone.game.settings.ForcedTFTendency;
 import com.lilithsthrone.game.settings.KeyCodeWithModifiers;
 import com.lilithsthrone.game.settings.KeyboardAction;
 import com.lilithsthrone.main.Main;
+import com.lilithsthrone.rendering.Artist;
+import com.lilithsthrone.rendering.Artwork;
 import com.lilithsthrone.utils.colours.Colour;
 import com.lilithsthrone.utils.colours.PresetColour;
 
 /**
  * @since 0.1.0
- * @version 0.4.2
+ * @version 0.4.10.8
  * @author Innoxia, Maxis
  */
 public class Properties {
@@ -64,18 +70,20 @@ public class Properties {
 	public String lastQuickSaveName = "";
 	public String nameColour = "";
 	public String name = "";
+	public String raceColour = "";
 	public String race = "";
 	public String quest = "";
 	public String versionNumber = "";
-	public String preferredArtist = "jam";
+	public List<String> artistPriority = new ArrayList<>();
 
 	public String badEndTitle = "";
 	
 	public int fontSize = 18;
 	public int level = 1;
-	public int money = 0;
+	public long money = 0;
 	public int arcaneEssences = 0;
 	
+	// Taur furry options:
 	public static final String[] taurFurryLevelName = new String[] {
 			"Untouched",
 			"Human",
@@ -92,6 +100,19 @@ public class Properties {
 			"If an NPC is generated as a taur, they will always have the upper-body of a greater morph, spawning in with furry ears, eyes, horns, antenna, breasts, arms, skin/fur, and face."};
 	public int taurFurryLevel = 2;
 
+	// Offspring gender options:
+	public static final String[] offspringGenderName = new String[] {
+			"No offspring",
+			"Self-offspring",
+			"NPC-offspring",
+			"All offspring"};
+	public static final String[] offspringGenderDescription = new String[] {
+			"The gender of all offspring birthed throughout the game by both NPCs and the player will use gender ratios which are derived from their race.",
+			"The gender of offspring birthed by the player will use the gender preferences that you've defined on this page. Offspring birthed by NPCs will use gender ratios which are derived from the offspring's race.",
+			"The gender of offspring birthed by NPCs will use the gender preferences that you've defined on this page. Offspring birthed by the player will use gender ratios which are derived from the offspring's race.",
+			"The gender of all offspring birthed throughout the game by both NPCs and the player will use the gender preferences that you've defined on this page."};
+	public int offspringGenderLevel = 0;
+	
 	public int humanSpawnRate = 5;
 	public int taurSpawnRate = 5;
 	public int halfDemonSpawnRate = 5;
@@ -118,6 +139,9 @@ public class Properties {
 			"Neither randomly-generated taurs nor anthro-morphs will ever have udders or crotch-boobs.",
 			"Randomly-generated NPCs will only have udders or crotch-boobs if they have a non-bipedal body. (Default setting.)",
 			"Randomly-generated greater-anthro-morphs, as well as taurs, will have udders and crotch boobs."};
+
+	/** 0=off, 1=weekly, 2=daily, 3=hourly*/
+	private int hairGrowth = 1;
 	
 	public int autoSaveFrequency = 0;
 	public static String[] autoSaveLabels = new String[] {"Always", "Daily", "Weekly"};
@@ -133,6 +157,13 @@ public class Properties {
 			"Sex action corruption requirements may be bypassed if your corruption level is one level below the required corruption level of the action, but you will gain corruption if you do so.",
 			"All sex action corruption requirements may be bypassed, but you will gain corruption if you do so."};
 
+	public int fullExposureDescriptions = 2;
+	public static String[] fullExposureDescriptionsLabels = new String[] {"Never", "Once", "Always"};
+	public static String[] getFullExposureDescriptionsDescriptions = new String[] {
+			"Full descriptions for revealed body parts will never be shown during sex.",
+			"Full descriptions for revealed body parts will only be shown during sex if it's your first time seeing them.",
+			"Full descriptions for revealed body parts will always be shown during sex."};
+	
 	public int pregnancyDuration = 1;
 	
 	public int forcedTFPercentage = 40;
@@ -283,6 +314,13 @@ public class Properties {
 		clothingDiscovered = new HashSet<>();
 		subspeciesDiscovered = new HashSet<>();
 		subspeciesAdvancedKnowledge = new HashSet<>();
+		
+		artistPriority = new ArrayList<>();
+		List<Artist> artists = new ArrayList<>(Artwork.allArtists);
+		Collections.sort(artists, (e1, e2)->e2.getArtworkCount()-e1.getArtworkCount());
+		for(Artist a : artists) {
+			artistPriority.add(a.getFolderName());
+		}
 	}
 	
 	public void savePropertiesAsXML(){
@@ -297,6 +335,7 @@ public class Properties {
 			createXMLElementWithValue(doc, previousSave, "location", lastSaveLocation);
 			createXMLElementWithValue(doc, previousSave, "nameColour", nameColour);
 			createXMLElementWithValue(doc, previousSave, "name", name);
+			createXMLElementWithValue(doc, previousSave, "raceColour", raceColour);
 			createXMLElementWithValue(doc, previousSave, "race", race);
 			createXMLElementWithValue(doc, previousSave, "quest", quest);
 			createXMLElementWithValue(doc, previousSave, "level", String.valueOf(level));
@@ -320,7 +359,9 @@ public class Properties {
 			properties.appendChild(settings);
 			createXMLElementWithValue(doc, settings, "fontSize", String.valueOf(fontSize));
 			
-			createXMLElementWithValue(doc, settings, "preferredArtist", preferredArtist);
+//			createXMLElementWithValue(doc, settings, "preferredArtist", preferredArtist);
+			
+			
 			if(!badEndTitle.isEmpty()) {
 				createXMLElementWithValue(doc, settings, "badEndTitle", badEndTitle);
 			}
@@ -331,8 +372,10 @@ public class Properties {
 			createXMLElementWithValue(doc, settings, "taurFurryLevel", String.valueOf(taurFurryLevel));
 			createXMLElementWithValue(doc, settings, "multiBreasts", String.valueOf(multiBreasts));
 			createXMLElementWithValue(doc, settings, "udders", String.valueOf(udders));
+			createXMLElementWithValue(doc, settings, "hairGrowth", String.valueOf(hairGrowth));
 			createXMLElementWithValue(doc, settings, "autoSaveFrequency", String.valueOf(autoSaveFrequency));
 			createXMLElementWithValue(doc, settings, "bypassSexActions", String.valueOf(bypassSexActions));
+			createXMLElementWithValue(doc, settings, "fullExposureDescriptions", String.valueOf(fullExposureDescriptions));
 			createXMLElementWithValue(doc, settings, "pregnancyDuration", String.valueOf(pregnancyDuration));
 			createXMLElementWithValue(doc, settings, "forcedTFPercentage", String.valueOf(forcedTFPercentage));
 			createXMLElementWithValue(doc, settings, "randomRacePercentage", String.valueOf(randomRacePercentage)); 
@@ -360,6 +403,22 @@ public class Properties {
 			createXMLElementWithValue(doc, settings, "difficultyLevel", difficultyLevel.toString());
 			createXMLElementWithValue(doc, settings, "AIblunderRate", String.valueOf(AIblunderRate));
 			
+			
+			// Artist priority:
+			Element artistPriorityElement = doc.createElement("artistPriority");
+			properties.appendChild(artistPriorityElement);
+			for(int i=0; i<artistPriority.size(); i++) {
+				Element element = doc.createElement("artist");
+				artistPriorityElement.appendChild(element);
+				
+				Attr name = doc.createAttribute("id");
+				name.setValue(artistPriority.get(i));
+				element.setAttributeNode(name);
+
+				Attr order = doc.createAttribute("order");
+				order.setValue(String.valueOf(i));
+				element.setAttributeNode(order);
+			}
 			
 			
 			// Game key binds:
@@ -672,10 +731,15 @@ public class Properties {
 				lastSaveLocation = ((Element)element.getElementsByTagName("location").item(0)).getAttribute("value");
 				nameColour = ((Element)element.getElementsByTagName("nameColour").item(0)).getAttribute("value");
 				name = ((Element)element.getElementsByTagName("name").item(0)).getAttribute("value");
+				raceColour = "";
+				try {
+					raceColour = ((Element)element.getElementsByTagName("raceColour").item(0)).getAttribute("value");
+				} catch(Exception ex) {
+				}
 				race = ((Element)element.getElementsByTagName("race").item(0)).getAttribute("value");
 				quest = ((Element)element.getElementsByTagName("quest").item(0)).getAttribute("value");
 				level = Integer.valueOf(((Element)element.getElementsByTagName("level").item(0)).getAttribute("value"));
-				money = Integer.valueOf(((Element)element.getElementsByTagName("money").item(0)).getAttribute("value"));
+				money = Long.valueOf(((Element)element.getElementsByTagName("money").item(0)).getAttribute("value"));
 				if(element.getElementsByTagName("arcaneEssences").item(0)!=null) {
 					arcaneEssences = Integer.valueOf(((Element)element.getElementsByTagName("arcaneEssences").item(0)).getAttribute("value"));
 				}
@@ -752,6 +816,12 @@ public class Properties {
 					if(Main.isVersionOlderThan(versionNumber, "0.4.7.7")) {
 						values.add(PropertyValue.muskContent);
 					}
+					if(Main.isVersionOlderThan(versionNumber, "0.4.9.6")) {
+						values.add(PropertyValue.lipLispContent);
+					}
+					if(Main.isVersionOlderThan(versionNumber, "0.4.10.4")) {
+						values.add(PropertyValue.mapZoomedIn);
+					}
 					
 					
 				} else {
@@ -805,10 +875,6 @@ public class Properties {
 				element = (Element) nodes.item(0);
 				fontSize = Integer.valueOf(((Element)element.getElementsByTagName("fontSize").item(0)).getAttribute("value"));
 				
-				if(element.getElementsByTagName("preferredArtist").item(0)!=null) {
-					preferredArtist =((Element)element.getElementsByTagName("preferredArtist").item(0)).getAttribute("value");
-				}
-
 				if(element.getElementsByTagName("badEndTitle").item(0)!=null) {
 					badEndTitle =((Element)element.getElementsByTagName("badEndTitle").item(0)).getAttribute("value");
 				}
@@ -880,6 +946,12 @@ public class Properties {
 					udders = 1;
 				}
 
+				if(element.getElementsByTagName("hairGrowth").item(0)!=null) {
+					hairGrowth = Integer.valueOf(((Element)element.getElementsByTagName("hairGrowth").item(0)).getAttribute("value"));
+				} else {
+					hairGrowth = 1;
+				}
+				
 				if(element.getElementsByTagName("autoSaveFrequency").item(0)!=null) {
 					autoSaveFrequency = Integer.valueOf(((Element)element.getElementsByTagName("autoSaveFrequency").item(0)).getAttribute("value"));
 				} else {
@@ -890,6 +962,12 @@ public class Properties {
 					bypassSexActions = Integer.valueOf(((Element)element.getElementsByTagName("bypassSexActions").item(0)).getAttribute("value"));
 				} else {
 					bypassSexActions = 2;
+				}
+
+				if(element.getElementsByTagName("fullExposureDescriptions").item(0)!=null) {
+					fullExposureDescriptions = Integer.valueOf(((Element)element.getElementsByTagName("fullExposureDescriptions").item(0)).getAttribute("value"));
+				} else {
+					fullExposureDescriptions = 2;
 				}
 				
 				if(element.getElementsByTagName("clothingFemininityLevel").item(0)!=null) {
@@ -949,6 +1027,38 @@ public class Properties {
 				try {
 					trapPenisSizePreference = Integer.valueOf(((Element)element.getElementsByTagName("trapPenisSizePreference").item(0)).getAttribute("value"));
 				}catch(Exception ex) {
+				}
+				
+				// Artist priority:
+				artistPriority = new ArrayList<>();
+				List<Artist> artists = new ArrayList<>(Artwork.allArtists);
+				artists.remove(Artwork.customArtist);
+				Collections.sort(artists, (e1, e2)->e2.getArtworkCount()-e1.getArtworkCount());
+				for(Artist a : artists) {
+					artistPriority.add(a.getFolderName());
+				}
+				
+				if(element.getElementsByTagName("preferredArtist").item(0)!=null) {
+					// Old version support:
+					String priorityname = ((Element)element.getElementsByTagName("preferredArtist").item(0)).getAttribute("value");
+					artistPriority.remove(priorityname);
+					artistPriority.add(0, priorityname);
+				}
+
+				nodes = doc.getElementsByTagName("artistPriority");
+				element = (Element) nodes.item(0);
+				if(element!=null && element.getElementsByTagName("artist")!=null) {
+					Map<String, Integer> loadedArtists = new HashMap<>();
+					for(int i=0; i<element.getElementsByTagName("artist").getLength(); i++){
+						Element e = ((Element)element.getElementsByTagName("artist").item(i));
+						
+						loadedArtists.put(e.getAttribute("id"), Integer.valueOf(e.getAttribute("order")));
+						artistPriority.remove(e.getAttribute("id"));
+					}
+					//TODO test
+					loadedArtists.entrySet().stream()
+						    .sorted(Map.Entry.comparingByValue())
+						    .forEach(entry -> artistPriority.add(entry.getKey()));
 				}
 				
 				// Keys:
@@ -1305,8 +1415,10 @@ public class Properties {
 	public void resetContentOptions() {
 		autoSaveFrequency = 0;
 		bypassSexActions = 2;
+		fullExposureDescriptions = 2;
 		multiBreasts = 1;
 		udders = 1;
+		hairGrowth = 1;
 		pregnancyDuration = 1;
 		forcedTFPercentage = 40;
 		forcedFetishPercentage = 40;
@@ -1362,8 +1474,8 @@ public class Properties {
 	
 	public void completeSharedEncyclopedia() {
 		for(AbstractSubspecies subspecies : Subspecies.getAllSubspecies()) {
-			this.addRaceDiscovered(subspecies);
-			this.addAdvancedRaceKnowledge(subspecies);
+			this.addRaceDiscovered(subspecies, false);
+			this.addAdvancedRaceKnowledge(subspecies, false);
 		}
 		for(AbstractItemType itemType : ItemType.getAllItems()) {
 			this.addItemDiscovered(itemType);
@@ -1375,6 +1487,13 @@ public class Properties {
 			this.addWeaponDiscovered(weaponType);
 		}
 	}
+	
+	public void addAllDiscoveredFromCurrentPlayer() {
+		Main.game.getPlayer().applyDiscoveriesToProperties();
+	}
+	
+	
+	//TODO counts below
 	
 	public int getItemsDiscoveredCount() {
 		if(!this.hasValue(PropertyValue.sharedEncyclopedia)) {
@@ -1401,10 +1520,13 @@ public class Properties {
 
 	/** This method <b>takes into account</b> the 'shared Encyclopedia' content setting. */
 	public boolean isItemDiscovered(AbstractItemType itemType) {
+		if(Main.game.getPlayer().isItemDiscovered(itemType)) {
+			return true;
+		}
 		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
 			return itemsDiscovered.contains(itemType);
 		}
-		return Main.game.getPlayer().isItemDiscovered(itemType);
+		return false;
 	}
 
 	public void resetItemDiscovered() {
@@ -1436,10 +1558,13 @@ public class Properties {
 
 	/** This method <b>takes into account</b> the 'shared Encyclopedia' content setting. */
 	public boolean isClothingDiscovered(AbstractClothingType clothingType) {
+		if(Main.game.getPlayer().isClothingDiscovered(clothingType)) {
+			return true;
+		}
 		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
 			return clothingDiscovered.contains(clothingType);
 		}
-		return Main.game.getPlayer().isClothingDiscovered(clothingType);
+		return false;
 	}
 
 	public void resetClothingDiscovered() {
@@ -1471,27 +1596,37 @@ public class Properties {
 
 	/** This method <b>takes into account</b> the 'shared Encyclopedia' content setting. */
 	public boolean isWeaponDiscovered(AbstractWeaponType weaponType) {
+		if(Main.game.getPlayer().isWeaponDiscovered(weaponType)) {
+			return true;
+		}
 		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
 			return weaponsDiscovered.contains(weaponType);
 		}
-		return Main.game.getPlayer().isWeaponDiscovered(weaponType);
+		return false;
 	}
 
 	public void resetWeaponDiscovered() {
 		weaponsDiscovered.clear();
 	}
-
+	
 	public int getSubspeciesDiscoveredCount() {
-		if(!this.hasValue(PropertyValue.sharedEncyclopedia)) {
-			return Main.game.getPlayer().getSubspeciesDiscoveredCount();
+		Set<AbstractSubspecies> combinedDiscoverySet = new HashSet<>(Main.game.getPlayer().getSubspeciesDiscovered());
+		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
+			combinedDiscoverySet.addAll(subspeciesDiscovered);
 		}
-		return subspeciesDiscovered.size();
+		return combinedDiscoverySet.size();
+	}
+
+	public boolean addRaceDiscovered(AbstractSubspecies subspecies) {
+		return addRaceDiscovered(subspecies, true);
 	}
 	
-	public boolean addRaceDiscovered(AbstractSubspecies subspecies) {
+	public boolean addRaceDiscovered(AbstractSubspecies subspecies, boolean withEvent) {
 		boolean playerDiscovered = Main.game.getPlayer().addRaceDiscovered(subspecies);
 		if(subspeciesDiscovered.add(subspecies) || (!this.hasValue(PropertyValue.sharedEncyclopedia) && playerDiscovered)) {
-			Main.game.addEvent(new EventLogEntryEncyclopediaUnlock(subspecies.getName(null), subspecies.getColour(null)), true);
+			if(withEvent) {
+				Main.game.addEvent(new EventLogEntryEncyclopediaUnlock(subspecies.getName(null), subspecies.getColour(null)), true);
+			}
 			setValue(PropertyValue.newRaceDiscovered, true);
 			return true;
 		}
@@ -1500,10 +1635,13 @@ public class Properties {
 
 	/** This method <b>takes into account</b> the 'shared Encyclopedia' content setting. */
 	public boolean isRaceDiscovered(AbstractSubspecies subspecies) {
+		if(Main.game.getPlayer().isRaceDiscovered(subspecies)) {
+			return true;
+		}
 		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
 			return subspeciesDiscovered.contains(subspecies);
 		}
-		return Main.game.getPlayer().isRaceDiscovered(subspecies);
+		return false;
 	}
 
 	public void resetRaceDiscovered() {
@@ -1511,16 +1649,23 @@ public class Properties {
 	}
 
 	public int getSubspeciesAdvancedDiscoveredCount() {
-		if(!this.hasValue(PropertyValue.sharedEncyclopedia)) {
-			return Main.game.getPlayer().getSubspeciesAdvancedDiscoveredCount();
+		Set<AbstractSubspecies> combinedDiscoverySet = new HashSet<>(Main.game.getPlayer().getSubspeciesAdvancedDiscovered());
+		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
+			combinedDiscoverySet.addAll(subspeciesAdvancedKnowledge);
 		}
-		return subspeciesAdvancedKnowledge.size();
+		return combinedDiscoverySet.size();
+	}
+
+	public boolean addAdvancedRaceKnowledge(AbstractSubspecies subspecies) {
+		return addAdvancedRaceKnowledge(subspecies, true);
 	}
 	
-	public boolean addAdvancedRaceKnowledge(AbstractSubspecies subspecies) {
+	public boolean addAdvancedRaceKnowledge(AbstractSubspecies subspecies, boolean withEvent) {
 		boolean playerDiscovered = Main.game.getPlayer().addAdvancedRaceKnowledge(subspecies);
 		if(subspeciesAdvancedKnowledge.add(subspecies) || (!this.hasValue(PropertyValue.sharedEncyclopedia) && playerDiscovered)) {
-			Main.game.addEvent(new EventLogEntryEncyclopediaUnlock(subspecies.getName(null)+" (Advanced)", subspecies.getColour(null)), true);
+			if(withEvent) {
+				Main.game.addEvent(new EventLogEntryEncyclopediaUnlock(subspecies.getName(null)+" (Advanced)", subspecies.getColour(null)), true);
+			}
 			return true;
 		}
 		return false;
@@ -1528,6 +1673,9 @@ public class Properties {
 
 	/** This method <b>takes into account</b> the 'shared Encyclopedia' content setting. */
 	public boolean isAdvancedRaceKnowledgeDiscovered(AbstractSubspecies subspecies) {
+		if(Main.game.getPlayer().isAdvancedRaceKnowledgeDiscovered(subspecies)) {
+			return true;
+		}
 		if(this.hasValue(PropertyValue.sharedEncyclopedia)) {
 			if(subspeciesAdvancedKnowledge.contains(subspecies)) {
 				return true;
@@ -1540,7 +1688,7 @@ public class Properties {
 			
 			return false;
 		}
-		return Main.game.getPlayer().isAdvancedRaceKnowledgeDiscovered(subspecies);
+		return false;
 	}
 
 	public void resetAdvancedRaceKnowledge() {
@@ -1584,6 +1732,7 @@ public class Properties {
 	}
 
 	public void resetGenderPreferences() {
+		offspringGenderLevel = 0;
 		genderPreferencesMap = new EnumMap<>(Gender.class);
 		for(Gender g : Gender.values()) {
 			genderPreferencesMap.put(g, g.getGenderPreferenceDefault().getValue());
@@ -1663,8 +1812,56 @@ public class Properties {
 	public int getUddersLevel() {
 		return udders;
 	}
-	
+
+	/** 0=off, 1=taur-only, 2=on*/
 	public void setUddersLevel(int udders) {
 		this.udders = udders;
+	}
+
+	/** 0=off, 1=weekly, 2=daily, 3=hourly*/
+	public int getHairGrowth() {
+		return hairGrowth;
+	}
+
+	/** 0=off, 1=weekly, 2=daily, 3=hourly*/
+	public void setHairGrowth(int hairGrowth) {
+		this.hairGrowth = hairGrowth;
+	}
+	
+	public boolean isOffspringGenderUsingPreferences(GameCharacter mother) {
+		if(offspringGenderLevel==3) {
+			return true;
+		}
+		if(mother!=null) {
+			if(mother.isPlayer()) {
+				return offspringGenderLevel==1;
+			} else {
+				return offspringGenderLevel==2;
+			}
+		}
+		return false;
+	}
+	
+	public List<String> getArtistPriority() {
+		return artistPriority;
+	}	
+	
+	/**
+	 * Moves the artist's priority up or down based on modification. Maximum priority is at 0.
+	 */
+	public void modifyArtistPriority(String artist, int modification) {
+		int index = artistPriority.indexOf(artist);
+		artistPriority.remove(artist);
+		index += modification;
+		index = Math.max(0, Math.min(index, artistPriority.size()));
+		artistPriority.add(index, artist);
+	}
+	
+	/**
+	 * @return The priority of this artist for rendering order. Maximum is 1000, which decreases as priority reduces.
+	 * <br/><i>(The returned value is probably going to be in a very limited range, such as ~995-1000. 1000 is used as a safe buffer amount.)</i>
+	 */
+	public int getArtistPriority(String artist) {
+		return 1000 - artistPriority.indexOf(artist);
 	}
 }

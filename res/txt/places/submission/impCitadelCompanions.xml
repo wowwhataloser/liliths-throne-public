@@ -1446,6 +1446,7 @@
 	<htmlContent tag="TREASURY_SEARCH"><![CDATA[
 	<p>
 		You and [npc.name] spend a short while carefully searching through the rubble, making sure not to disturb any of the debris that looks to be particularly unstable. It doesn't take long before your companion finds a small chest, containing a considerable amount of flames.
+	</p>
 	<p>
 		Encouraged by this early success, the two of you continue searching, but, after ten more minutes, you've explored the entire room and haven't found anything else of value. Just as you're about to give up, you notice a door-shaped indentation in one of the few sections of wall left undamaged by the collapse. Pressing your [pc.hand] against it, you inadvertently trigger an internal mechanism of some kind, and the stone wall sinks into the floor to reveal a huge, undamaged wardrobe.
 	</p>
@@ -1826,7 +1827,7 @@
 	#IF pc.getHeightValue()>siren.getHeightValue()
 	#THEN
 		<p>
-			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turing towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
+			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turning towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
 		</p>
 		<p>
 			Placing [npc.her] trust in you, your companion does as you say, and runs to safety. Dodging a falling chunk of the ceiling, you rush over to where [siren.name] is lying on the floor, and, scooping her up in your [pc.arms], you turn and rush out of the throne room's huge stone archway, only to discover that her spell is causing the entire citadel to collapse. Huge sections of the cavern's roof are giving way and collapsing to the floor, causing the ground to shake and rumble underfoot as rocks and debris are sent scattering over the carved flagstones.
@@ -1845,7 +1846,7 @@
 		</p>
 	#ELSE
 		<p>
-			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turing towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
+			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turning towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
 		</p>
 		<p>
 			Placing [npc.her] trust in you, your companion does as you say, and runs to safety. Dodging a falling chunk of the ceiling, you rush over to where [siren.name] is lying on the floor, and, helping her up onto her feet, you loop one of her arms around your shoulders. Half-carrying, half-supporting the exhausted siren, you hurry as fast as you can out of the throne room's huge stone archway, only to discover that her spell is causing the entire citadel to collapse. Huge sections of the cavern's roof are giving way and collapsing to the floor, causing the ground to shake and rumble underfoot as rocks and debris are sent scattering over the carved flagstones.
@@ -1870,7 +1871,7 @@
 	#IF pc.getHeightValue()>siren.getHeightValue()
 	#THEN
 		<p>
-			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turing towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
+			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turning towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
 		</p>
 		<p>
 			Placing [npc.her] trust in you, your companion does as you say, and runs to safety. Dodging a falling chunk of the ceiling, you rush over to where [siren.name] is lying on the floor, and, scooping her up in your [pc.arms], you turn and rush out of the throne room's huge stone archway, only to discover that her spell is causing the entire citadel to collapse. Huge sections of the cavern's roof are giving way and collapsing to the floor, causing the ground to shake and rumble underfoot as rocks and debris are sent scattering over the carved flagstones.
@@ -1878,6 +1879,7 @@
 		<p>
 			You've already defeated and driven out all of the residents of the citadel, so, other than you, [npc.name], [siren.name], and the demon lieutenants, nobody is in any danger. With your heart pounding in your chest, and the small siren cowering in your [pc.arms], you somehow manage to dodge all of the falling boulders and collapsing masonry as you rush across the courtyard and follow the three demons out into Submission's cavern.
 		</p>
+		<p>
 			Miraculously, all six of you manage to make it out without injury, but, while that's a relief for everybody involved, your troubles aren't over yet. Surrounding the main gates, and with arcane muskets at the ready, there are at least thirty of Lyssieth's elite guard. Several of them are talking to [siren.namePos] lieutenants, but, due to their demon status, it looks like they're going to be released without anything happening to them.
 		</p>
 		<p>
@@ -1888,7 +1890,7 @@
 		</p>
 	#ELSE
 		<p>
-			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turing towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
+			Even though she was your enemy just a moment ago, there's no way you're going to leave [siren.name] behind! Turning towards your companion, you command [npc.herHim], [pc.speech(Get out of here, [npc.name]! I'm going to help [siren.name]!)]
 		</p>
 		<p>
 			Placing [npc.her] trust in you, your companion does as you say, and runs to safety. Dodging a falling chunk of the ceiling, you rush over to where [siren.name] is lying on the floor, and, helping her up onto her feet, you loop one of her arms around your shoulders. Half-carrying, half-supporting the exhausted siren, you hurry as fast as you can out of the throne room's huge stone archway, only to discover that her spell is causing the entire citadel to collapse. Huge sections of the cavern's roof are giving way and collapsing to the floor, causing the ground to shake and rumble underfoot as rocks and debris are sent scattering over the carved flagstones.

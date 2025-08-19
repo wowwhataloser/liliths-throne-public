@@ -24,7 +24,7 @@ import com.lilithsthrone.utils.Util;
 
 /**
  * @since 0.1.79
- * @version 0.3.4.5
+ * @version 0.4.11.2
  * @author Innoxia
  */
 public class PlayerTalk {
@@ -120,6 +120,13 @@ public class PlayerTalk {
 				}
 			}
 			
+			if(Main.sex.getCharacterTargetedForSexAction(this).isAsleep()) {
+				return UtilText.returnStringAtRandom(
+						"Not wanting to wake [npc2.name] up, [npc.name] quietly [npc.verb(tease)], ",
+						"Making sure to keep [npc.her] voice down so as to not wake [npc2.name] up, [npc.name] [npc.verb(whisper)], ")
+						+ Main.sex.getDirtyTalk(Main.game.getPlayer());
+			}
+			
 			if(Main.sex.getSexPositionSlot(Main.game.getPlayer()).hasTag(SexSlotTag.ALL_FOURS)) {
 				
 				switch(Main.sex.getSexPace(Main.game.getPlayer())) {
@@ -181,7 +188,6 @@ public class PlayerTalk {
 				}
 				
 			} else if(Main.sex.getSexPositionSlot(Main.game.getPlayer()).hasTag(SexSlotTag.SIXTY_NINE)) {
-				
 				switch(Main.sex.getSexPace(Main.game.getPlayer())) {
 					case DOM_GENTLE:
 						return UtilText.returnStringAtRandom(
@@ -440,7 +446,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return Main.game.getPlayer().hasVagina()
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& Main.game.getPlayer().hasVagina()
 					&& Main.game.getPlayer().isAbleToAccessCoverableArea(CoverableArea.VAGINA, true)
 					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.VAGINA))
 					&& Main.sex.getCharacterPerformingAction().isPlayer();
@@ -506,7 +513,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return Main.sex.getCharacterTargetedForSexAction(this).hasVagina()
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& Main.sex.getCharacterTargetedForSexAction(this).hasVagina()
 					&& Main.sex.getCharacterTargetedForSexAction(this).isAreaKnownByCharacter(CoverableArea.VAGINA, Main.game.getPlayer())
 					&& Main.sex.getCharacterTargetedForSexAction(this).isAbleToAccessCoverableArea(CoverableArea.VAGINA, true)
 					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, SexAreaOrifice.VAGINA, null))
@@ -574,7 +582,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.ANUS))
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.ANUS))
 					&& Main.game.getPlayer().isAbleToAccessCoverableArea(CoverableArea.ANUS, true)
 					&& Main.sex.getCharacterPerformingAction().isPlayer();
 		}
@@ -654,7 +663,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return Main.sex.getCharacterTargetedForSexAction(this).isAbleToAccessCoverableArea(CoverableArea.ANUS, true)
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& Main.sex.getCharacterTargetedForSexAction(this).isAbleToAccessCoverableArea(CoverableArea.ANUS, true)
 					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, SexAreaOrifice.ANUS, null))
 					&& Main.sex.getCharacterPerformingAction().isPlayer()
 					&& !Main.sex.isDom(Main.game.getPlayer());
@@ -727,7 +737,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.MOUTH))
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.MOUTH))
 					&& Main.game.getPlayer().isAbleToAccessCoverableArea(CoverableArea.MOUTH, true)
 					&& Main.sex.getCharacterPerformingAction().isPlayer();
 		}
@@ -796,7 +807,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, SexAreaOrifice.MOUTH, null))
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, SexAreaOrifice.MOUTH, null))
 					&& Main.sex.getCharacterTargetedForSexAction(this).isAbleToAccessCoverableArea(CoverableArea.MOUTH, true)
 					&& Main.sex.getCharacterPerformingAction().isPlayer()
 					&& !Main.sex.isDom(Main.game.getPlayer());
@@ -874,7 +886,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return Main.game.getPlayer().isBreastFuckableNipplePenetration()
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& Main.game.getPlayer().isBreastFuckableNipplePenetration()
 					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.NIPPLE))
 					&& Main.game.getPlayer().isAbleToAccessCoverableArea(CoverableArea.NIPPLES, true)
 					&& Main.sex.getCharacterPerformingAction().isPlayer();
@@ -950,7 +963,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return Main.game.getPlayer().isBreastFuckablePaizuri()
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& Main.game.getPlayer().isBreastFuckablePaizuri()
 					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.BREAST))
 					&& Main.game.getPlayer().isAbleToAccessCoverableArea(CoverableArea.BREASTS, true)
 					&& Main.sex.getCharacterTargetedForSexAction(this).hasPenis()
@@ -1028,7 +1042,8 @@ public class PlayerTalk {
 
 		@Override
 		public boolean isBaseRequirementsMet() {
-			return !Main.game.getPlayer().isBreastFuckablePaizuri()
+			return !Main.sex.getCharacterTargetedForSexAction(this).isAsleep()
+					&& !Main.game.getPlayer().isBreastFuckablePaizuri()
 					&& !Main.sex.getRequestsBlocked(Main.game.getPlayer()).contains(new SexType(SexParticipantType.NORMAL, null, SexAreaOrifice.BREAST))
 					&& Main.game.getPlayer().isAbleToAccessCoverableArea(CoverableArea.BREASTS, true)
 					&& Main.sex.getCharacterTargetedForSexAction(this).hasPenis()

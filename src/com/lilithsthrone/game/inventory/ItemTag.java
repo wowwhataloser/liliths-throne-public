@@ -15,7 +15,9 @@ public enum ItemTag {
 
 	CHEAT_ITEM, // Cheat items are hidden in the debug spawner, and are also not added to the Encyclopedia.
 	SILLY_MODE, // Silly mode items only appear in shopkeepers inventories when silly mode is on.
+	FILLY_NAMING(Util.newArrayListOfValues("Replaces Natalya's 'mule' references to 'filly'"), false), // Special tag used for the mule/filly choker
 	
+	REMOVE_FROM_DRESSING_ROOM_OUTFITS,
 	REMOVE_FROM_DEBUG_SPAWNER,
 	NOT_FOR_SALE,
 	
@@ -91,6 +93,19 @@ public enum ItemTag {
 	
 	//-------------- WEAPONS & CLOTHING --------------//
 	
+	// ----- Weapon-specific tags: ----- //
+	WEAPON_FERAL_EQUIPPABLE( // Allows ferals to equip this weapon (as they cannot equip weapons by default)
+			Util.newArrayListOfValues(
+					"[style.colourFeral(Can be equipped by ferals)]"),
+			false),
+	
+	WEAPON_BLADE, // Should be added to all weapons that use an arcane blade
+	
+	WEAPON_FIREARM, // Should be added to all weapons that should be considered to be a firearm
+	
+	WEAPON_UNARMED, // Should be added to all weapons that should use unarmed damage calculations instead of melee
+	//   ------------------------------ //
+	
 	/** Excludes this clothing from being randomly chosen to equip on an NPC in automatic outfit generation.
 	 *  Also excludes the clothing from randomly spawning as tile-exploration loot.
 	 *  This only really affects common-rarity clothing, as all clothing of a rarity higher than common are typically only able to be added to characters directly. */
@@ -119,18 +134,16 @@ public enum ItemTag {
 			Util.newArrayListOfValues(
 					"[style.colourSex(Cannot conceal any body parts)]"),
 			false),
-
-	WEAPON_FERAL_EQUIPPABLE( // Allows ferals to equip this weapon (as they cannot equip weapons by default)
-			Util.newArrayListOfValues(
-					"[style.colourFeral(Can be equipped by ferals)]"),
-			false),
 	
-	WEAPON_BLADE, // Should be added to all weapons that use an arcane blade
-	
-	WEAPON_UNARMED, // Should be added to all weapons that should use unarmed damage calculations instead of melee
+	IGNORE_HAIR_RESTRICTION, // If a piece of clothing has this tag, it can always be equipped into the HAIR slot, even if the equipping character has no hair.
 	
 	DRESS, // For helping to generate clothing in CharacterUtils
 	SWIMWEAR, // For helping to generate clothing in CharacterUtils
+	
+	PRESCRIPTION_GLASSES(  // Negates the blurry vision status effect
+			Util.newArrayListOfValues(
+					"[style.colourGood(Enchanted prescription lenses enhance the wearer's vision)]"),
+			false),
 
 	PROVIDES_KEY( // The person who equips this clothing will get an unlock key, making the unsealing cost 0
 			Util.newArrayListOfValues(
@@ -142,6 +155,12 @@ public enum ItemTag {
 					"[style.colourBad(Unenchantable)]"),
 			false),
 
+	// If clothing has these tags, then it will act as though the associated bodyPart is added to the blockedBodyParts list
+	// This is mainly useful for stickers, as normally you should be using the blockedBodyParts list to define blocked areas
+	// Look at the innoxia_latex_hood clothing item to see these in use
+	APPLIES_BLOCKED_BODY_PART_EYES(Util.newArrayListOfValues("[style.colourBad(Blocks eyes)]"), false),
+	APPLIES_BLOCKED_BODY_PART_MOUTH(Util.newArrayListOfValues("[style.colourBad(Blocks mouth)]"), false),
+	
 	SPREADS_FEET( // Prevents double foot actions, like wrap-around footjobs
 			Util.newArrayListOfValues(
 					"[style.colourBad(Restricts sex actions)]"),
@@ -174,7 +193,9 @@ public enum ItemTag {
 					"[style.colourTerrible(Prevents combat escape)]"),
 			false),
 	
-	DISCARDED_WHEN_UNEQUIPPED( //  Makes the clothing be thrown away when unequipped. E.g. Condoms
+	DUPLICATE_WHEN_EQUIP,  // Instead of removing the clothing from the inventory it's in, duplicate the clothing and then equip the duplicate instead. This should probably be paired with DISCARDED_WHEN_UNEQUIPPED, and is used for the electrical tape roll.
+	
+	DISCARDED_WHEN_UNEQUIPPED( // Makes the clothing be thrown away when unequipped. E.g. Condoms
 			Util.newArrayListOfValues(
 					"[style.colourMinorBad(Discarded when unequipped)]"),
 			false),
@@ -266,6 +287,10 @@ public enum ItemTag {
 	FITS_NON_BIPED_BODY_HUMANOID(
 			Util.newArrayListOfValues(
 					"[style.colourHuman(Fits humanoid parts of non-biped bodies)]"),
+			false),
+	FITS_BIPEDS(
+			Util.newArrayListOfValues(
+					"[style.colourTfGeneric(Only fits bipedal bodies)]"),
 			false),
 	FITS_TAUR_BODY(
 			Util.newArrayListOfValues(

@@ -71,6 +71,7 @@ import com.lilithsthrone.game.character.npc.dominion.Lilaya;
 import com.lilithsthrone.game.character.persona.NameTriplet;
 import com.lilithsthrone.game.character.persona.Occupation;
 import com.lilithsthrone.game.character.persona.PersonalityTrait;
+import com.lilithsthrone.game.character.persona.Relationship;
 import com.lilithsthrone.game.character.persona.SexualOrientation;
 import com.lilithsthrone.game.character.quests.Quest;
 import com.lilithsthrone.game.character.quests.QuestLine;
@@ -121,7 +122,7 @@ public class Lyssieth extends NPC {
 				7734, Month.OCTOBER, 13,
 				1000,
 				Gender.F_V_B_FEMALE, Subspecies.HUMAN, RaceStage.GREATER,
-				new CharacterInventory(10),
+				new CharacterInventory(false, 10),
 				WorldType.LYSSIETH_PALACE, PlaceType.LYSSIETH_PALACE_OFFICE,
 				true);
 		
@@ -223,7 +224,7 @@ public class Lyssieth extends NPC {
 		
 		// Body:
 		this.setSubspeciesOverride(Subspecies.ELDER_LILIN);
-		this.setAgeAppearanceDifferenceToAppearAsAge(45);
+		this.setAgeAppearanceAbsolute(45);
 //		this.setTailType(TailType.DEMON_COMMON);
 //		this.setWingType(WingType.DEMON_COMMON);
 //		this.setHornType(HornType.CURLED);
@@ -346,6 +347,11 @@ public class Lyssieth extends NPC {
 		return true;
 	}
 	
+	@Override
+	public int getLevel() {
+		return 1000;
+	}
+	
 //	@Override
 //	public void turnUpdate() {
 //		if(!Main.game.getCharactersPresent().contains(this)) {
@@ -369,15 +375,9 @@ public class Lyssieth extends NPC {
 	@Override
 	public String getArtworkFolderName() {
 		if(this.getTorsoType().getRace()==Race.HUMAN) {
-			if(this.isVisiblyPregnant()) {
-				return "LyssiethHumanPregnant";
-			}
 			return "LyssiethHuman";
 			
 		} else {
-			if(this.isVisiblyPregnant()) {
-				return "LyssiethDemonPregnant";
-			}
 			return "LyssiethDemon";
 		}
 	}
@@ -432,14 +432,20 @@ public class Lyssieth extends NPC {
 		// Change perk to demon version:
 		Main.game.getPlayer().handleDemonicTransformationPerkEffects();
 	}
-	
+
 	public void setDaughterToFullDemon(Class<? extends NPC> daughterClass) {
+		setDaughterToFullDemon(daughterClass, true);
+	}
+	
+	public void setDaughterToFullDemon(Class<? extends NPC> daughterClass, boolean includeArousalChanges) {
 		setDaughterDemonicBodyParts(Main.game.getNpc(daughterClass));
 		
-		Main.game.getNpc(Lilaya.class).setArousal(100);
-		Main.game.getPlayer().setArousal(100, true);
-		if(Main.game.isInSex() && Main.sex.getAllParticipants().contains(Main.game.getNpc(DarkSiren.class))) {
-			Main.game.getNpc(DarkSiren.class).setArousal(100);
+		if(includeArousalChanges) {
+			Main.game.getNpc(Lilaya.class).setArousal(100);
+			Main.game.getPlayer().setArousal(100, true);
+			if(Main.game.isInSex() && Main.sex.getAllParticipants().contains(Main.game.getNpc(DarkSiren.class))) {
+				Main.game.getNpc(DarkSiren.class).setArousal(100);
+			}
 		}
 		
 		Main.game.getNpc(daughterClass).loadImages(true);
@@ -931,6 +937,14 @@ public class Lyssieth extends NPC {
 	public boolean isAbleToBeImpregnated() {
 		return true;
 	}
+
+	@Override
+	public Set<Relationship> getRelationshipsTo(GameCharacter character, Relationship... excludedRelationships) {
+		if(character.isPlayer() && Main.game.getDialogueFlags().hasFlag("innoxia_child_of_lyssieth")) {
+			return Util.newHashSetOfValues(Relationship.Parent);
+		}
+		return super.getRelationshipsTo(character, excludedRelationships);
+	}
 	
 	public void growCock(AbstractPenisType type) {
 		this.setPenisType(type);
@@ -965,7 +979,7 @@ public class Lyssieth extends NPC {
 		
 		// Body:
 		this.setSubspeciesOverride(Subspecies.ELDER_LILIN);
-		this.setAgeAppearanceDifferenceToAppearAsAge(45);
+		this.setAgeAppearanceAbsolute(45);
 		this.setTailType(TailType.DEMON_COMMON);
 		this.setTailGirth(PenetrationGirth.FOUR_GIRTHY);
 		this.setWingType(WingType.DEMON_COMMON);

@@ -29,11 +29,13 @@ import com.lilithsthrone.game.sex.sexActions.baseActions.PenisArmpit;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisAss;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisBreasts;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisBreastsCrotch;
+import com.lilithsthrone.game.sex.sexActions.baseActions.PenisPenisCloaca;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisFeet;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisFoot;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisMouth;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisNipple;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisNippleCrotch;
+import com.lilithsthrone.game.sex.sexActions.baseActions.PenisPenis;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisSpinneret;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisThighs;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisUrethraPenis;
@@ -41,9 +43,13 @@ import com.lilithsthrone.game.sex.sexActions.baseActions.PenisUrethraVagina;
 import com.lilithsthrone.game.sex.sexActions.baseActions.PenisVagina;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TailAnus;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TailMouth;
+import com.lilithsthrone.game.sex.sexActions.baseActions.TailNipple;
+import com.lilithsthrone.game.sex.sexActions.baseActions.TailNippleCrotch;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TailVagina;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TentacleAnus;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TentacleMouth;
+import com.lilithsthrone.game.sex.sexActions.baseActions.TentacleNipple;
+import com.lilithsthrone.game.sex.sexActions.baseActions.TentacleNippleCrotch;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TentacleVagina;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TongueAnus;
 import com.lilithsthrone.game.sex.sexActions.baseActions.TongueArmpit;
@@ -457,11 +463,15 @@ public class SexActionPresets {
 		sexActions.add(TailAnus.class);
 		sexActions.add(TailVagina.class);
 		sexActions.add(TailMouth.class);
+		sexActions.add(TailNipple.class);
+		sexActions.add(TailNippleCrotch.class);
 
 		// Tentacle actions:
 		sexActions.add(TentacleAnus.class);
 		sexActions.add(TentacleVagina.class);
 		sexActions.add(TentacleMouth.class);
+		sexActions.add(TentacleNipple.class);
+		sexActions.add(TentacleNippleCrotch.class);
 		
 		// Penis actions:
 		sexActions.add(PenisAss.class);
@@ -478,6 +488,8 @@ public class SexActionPresets {
 		sexActions.add(PenisUrethraPenis.class);
 		sexActions.add(PenisSpinneret.class);
 		sexActions.add(PenisArmpit.class);
+		sexActions.add(PenisPenis.class);
+		sexActions.add(PenisPenisCloaca.class);
 		
 		// Vagina/clit actions:
 		sexActions.add(ClitClit.class);

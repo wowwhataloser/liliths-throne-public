@@ -13,6 +13,7 @@ import java.util.Set;
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.attributes.Attribute;
 import com.lilithsthrone.game.character.fetishes.Fetish;
+import com.lilithsthrone.game.character.npc.misc.Elemental;
 import com.lilithsthrone.game.character.persona.SexualOrientation;
 import com.lilithsthrone.main.Main;
 import com.lilithsthrone.utils.Pathing;
@@ -25,7 +26,7 @@ import com.lilithsthrone.utils.colours.PresetColour;
  * Singleton enforced by Enum. Because everyone loves Enums.
  * 
  * @since 0.1.99
- * @version 0.3.4
+ * @version 0.4.9
  * @author Innoxia
  */
 public enum PerkManager {
@@ -38,9 +39,11 @@ public enum PerkManager {
 	
 	private Map<Integer, Map<PerkCategory, List<TreeEntry<PerkCategory, AbstractPerk>>>> perkTree;
 	private Map<Integer, Map<PerkCategory, List<TreeEntry<PerkCategory, AbstractPerk>>>> elementalPerkTree;
+	private Map<Integer, Map<PerkCategory, List<TreeEntry<PerkCategory, AbstractPerk>>>> dollPerkTree;
 	
 	private List<TreeEntry<PerkCategory, AbstractPerk>> elementalStartingPerks = new ArrayList<>();
 	private List<TreeEntry<PerkCategory, AbstractPerk>> standardStartingPerks = new ArrayList<>();
+	private List<TreeEntry<PerkCategory, AbstractPerk>> dollStartingPerks = new ArrayList<>();
 	
 	public static final int ROWS = 20;
 	
@@ -77,6 +80,7 @@ public enum PerkManager {
 		
 		leftA = addPerkEntry(perkTree, PerkCategory.PHYSICAL, 2, Perk.PHYSIQUE_BOOST, physical1);
 		addPerkEntry(perkTree, PerkCategory.PHYSICAL, 2, Perk.OBSERVANT, physical1);
+		addPerkEntry(perkTree, PerkCategory.PHYSICAL, 2, Perk.HEAVY_SLEEPER, physical1);
 
 		leftC = addPerkEntry(perkTree, PerkCategory.PHYSICAL, 2, Perk.ENCHANTMENT_STABILITY, physical1);
 		
@@ -410,7 +414,45 @@ public enum PerkManager {
 		arcane1 = addPerkEntry(elementalPerkTree, PerkCategory.ARCANE, 10, Perk.ELEMENTAL_AIR_BOOST, arcane2);
 		arcane2 = addPerkEntry(elementalPerkTree, PerkCategory.ARCANE, 11, Perk.ELEMENTAL_AIR_BOOST_MAJOR, arcane1);
 		arcane1 = addPerkEntry(elementalPerkTree, PerkCategory.ARCANE, 12, Perk.ELEMENTAL_AIR_BOOST_ULTIMATE, arcane2);
+
 		
+		// Doll version of the perk tree:
+		dollPerkTree = new HashMap<>();
+		
+		// Initialise NPCPerkTree:
+		for(int i = 0; i<ROWS; i++) {
+			dollPerkTree.put(i, new HashMap<>());
+			for(PerkCategory category : PerkCategory.values()) {
+				dollPerkTree.get(i).put(category, new ArrayList<>());
+			}
+		}
+
+		physical1 = addPerkEntry(dollPerkTree, PerkCategory.PHYSICAL, 1, Perk.DOLL_PHYSICAL_CORE);
+		dollStartingPerks.add(physical1);
+		TreeEntry<PerkCategory, AbstractPerk> dollPerk = addPerkEntry(dollPerkTree, PerkCategory.PHYSICAL, 2, Perk.DOLL_PHYSICAL_1, physical1);
+		dollStartingPerks.add(dollPerk);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.PHYSICAL, 2, Perk.DOLL_PHYSICAL_2, physical1);
+		dollStartingPerks.add(dollPerk);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.PHYSICAL, 2, Perk.DOLL_PHYSICAL_3, physical1);
+		dollStartingPerks.add(dollPerk);
+		
+		arcane1 = addPerkEntry(dollPerkTree, PerkCategory.ARCANE, 1, Perk.DOLL_ARCANE_CORE);
+		dollStartingPerks.add(arcane1);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.ARCANE, 2, Perk.DOLL_ARCANE_1, arcane1);
+		dollStartingPerks.add(dollPerk);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.ARCANE, 2, Perk.DOLL_ARCANE_2, arcane1);
+		dollStartingPerks.add(dollPerk);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.ARCANE, 2, Perk.DOLL_ARCANE_3, arcane1);
+		dollStartingPerks.add(dollPerk);
+		
+		both1 = addPerkEntry(dollPerkTree, PerkCategory.LUST, 1, Perk.DOLL_LUST_CORE, physical1, arcane1);
+		dollStartingPerks.add(both1);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.LUST, 2, Perk.DOLL_LUST_1, both1);
+		dollStartingPerks.add(dollPerk);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.LUST, 2, Perk.DOLL_LUST_2, both1);
+		dollStartingPerks.add(dollPerk);
+		dollPerk = addPerkEntry(dollPerkTree, PerkCategory.LUST, 2, Perk.DOLL_LUST_3, both1);
+		dollStartingPerks.add(dollPerk);
 	}
 	
 	@SafeVarargs
@@ -441,6 +483,8 @@ public enum PerkManager {
 	public Map<Integer, Map<PerkCategory, List<TreeEntry<PerkCategory, AbstractPerk>>>> getPerkTree(GameCharacter character) {
 		if(character.isElemental()) {
 			return elementalPerkTree;
+		} else if(character.isDoll()) {
+			return dollPerkTree;
 		} else {
 			return perkTree;
 		}
@@ -449,6 +493,8 @@ public enum PerkManager {
 	public static List<TreeEntry<PerkCategory, AbstractPerk>> getStartingPerks(GameCharacter character) {
 		if(character.isElemental()) {
 			return MANAGER.elementalStartingPerks;
+		} else if(character.isDoll()) {
+			return MANAGER.dollStartingPerks;
 		} else {
 			return MANAGER.standardStartingPerks;
 		}
@@ -524,6 +570,11 @@ public enum PerkManager {
 				case PHYSICAL_WATER:
 					break;
 			}
+			
+			// 5% chance for short-sighted NPC
+			if(Math.random()<0.05f && !character.isPerfectVision()) {
+				character.addSpecialPerk(Perk.SPECIAL_SHORT_SIGHTED);
+			}
 		}
 	}
 
@@ -549,13 +600,60 @@ public enum PerkManager {
 	public static Set<AbstractPerk> initialisePerks(GameCharacter character, boolean autoSelectPerks, List<AbstractPerk> requiredPerks, Map<PerkCategory, Integer> perkWeightingOverride) {
 		Set<AbstractPerk> perksAdded = new HashSet<>();
 		
+		if(character.isDoll()) {
+			requiredPerks = null;
+			perkWeightingOverride = null;
+		}
+		
 		for(TreeEntry<PerkCategory, AbstractPerk> perk : getStartingPerks(character)) {
 			if(character.addPerk(perk.getRow(), perk.getEntry())) {
 				perksAdded.add(perk.getEntry());
 			}
 		}
 		
-		if(!character.isElemental()) { // Elementals always start with an empty perk tree
+		if(character.isElemental()) {
+			// If the elemental has a summoner who isn't a player, then init the perk tree to fill out perks of the elemental's type
+			if(((Elemental)character).getSummoner()!=null && !((Elemental)character).getSummoner().isPlayer()) {
+				PerkCategory associatedPerkCategory = PerkCategory.LUST;
+				switch(((Elemental)character).getCurrentSchool()) {
+					case AIR:
+						associatedPerkCategory = PerkCategory.ARCANE_AIR;
+						break;
+					case ARCANE:
+						associatedPerkCategory = PerkCategory.LUST;
+						break;
+					case EARTH:
+						associatedPerkCategory = PerkCategory.PHYSICAL_EARTH;
+						break;
+					case FIRE:
+						associatedPerkCategory = PerkCategory.ARCANE_FIRE;
+						break;
+					case WATER:
+						associatedPerkCategory = PerkCategory.PHYSICAL_WATER;
+						break;
+				}
+				
+//				System.out.println(character.getName()+"x 1 "+associatedPerkCategory);
+				
+				outerloop:
+				for(Entry<Integer, Map<PerkCategory, List<TreeEntry<PerkCategory, AbstractPerk>>>> entry : MANAGER.elementalPerkTree.entrySet()) {
+					for(Entry<PerkCategory, List<TreeEntry<PerkCategory, AbstractPerk>>> innerEntry : entry.getValue().entrySet()) {
+						for(TreeEntry<PerkCategory, AbstractPerk> treeEntry : innerEntry.getValue()) {
+							if(treeEntry.getEntry().getPerkCategory()==associatedPerkCategory) {
+//								System.out.println(character.getName()+"x add "+treeEntry.getEntry().getName(character));
+								if(character.getPerkPoints()>0) {
+									character.addPerk(treeEntry.getRow(), treeEntry.getEntry());
+								} else {
+									break outerloop;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			
+		} else {
 			if(!character.isPlayer() && autoSelectPerks) {
 				// For each required perk, add it (along with all the perks on the path):
 				if(requiredPerks!=null) {
@@ -581,6 +679,7 @@ public enum PerkManager {
 				deniedPerks.add(Perk.HYPERMOBILITY);
 				if(character.isUnique()) {
 					deniedPerks.add(Perk.AHEGAO);
+					deniedPerks.add(Perk.HEAVY_SLEEPER);
 				}
 				if(character.getEnchantmentPointsUsedTotal()<=character.getAttributeValue(Attribute.ENCHANTMENT_LIMIT) || !Main.game.isEnchantmentCapacityEnabled()) {
 					deniedPerks.add(Perk.ENCHANTMENT_STABILITY);
