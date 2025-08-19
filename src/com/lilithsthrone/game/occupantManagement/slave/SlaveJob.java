@@ -540,12 +540,12 @@ public enum SlaveJob {
 	
 	MILKING(PresetColour.BASE_YELLOW_LIGHT,
 			1f,
-			-1,
+			-8,
 			2f,
 			"Dairy Cow",
 			"Dairy Bull",
 			"Assign this slave to the milking stalls, ready to have their milk, cum, and/or girlcum milked from them.",
-			-0.25f, 1f,
+			-5.25f, 21f,
 			0,
 			0, 0,
 			Util.newArrayListOfValues(
